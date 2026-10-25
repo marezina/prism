@@ -1,0 +1,27 @@
+# Changelog
+
+All notable user-visible changes. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
+versions: [SemVer](https://semver.org/). Before tagging, rename `[Unreleased]` to the
+version (e.g. `[0.1.0-beta.1] - 2026-11-02`); the release workflow uses that section
+as the release notes.
+
+## [Unreleased]
+
+### Added
+- Tray app for Windows 11 and Linux with an unread badge, offline state and a menu
+  (Open, Mark all as read, Pause 1 hour, Settings, Quit).
+- Sign in with GitHub (device flow) or a classic personal access token; the token is
+  kept in the OS keyring.
+- Organization picker; personal repositories optional; SSO-protected orgs flagged with
+  an "Authorize" link.
+- Notifications for your PRs: approved, changes requested, comments, thread replies,
+  CI failed / passed, merge conflicts, merged / closed, opened.
+- Notifications on other PRs: replies to your comments (threads and quote-replies),
+  @mentions of you or your team, review requests, new commits after your review.
+- Toasts with avatar and "Open PR" / "Mark as read"; bursts of 3+ become one summary;
+  sounds at most every 5 s; quiet hours, Do Not Disturb and a 1-hour pause.
+- Popup with tabs (All, My PRs, Reviews, Mentions, CI), PRs grouped, keyboard control
+  (↑/↓, Enter, E, Esc), light and dark theme.
+- Settings for every event (list / toast / sound), sounds, poll interval, bots,
+  drafts, quiet hours, start at login, theme; "Reset local data".
+- Update check against the internal release repo.

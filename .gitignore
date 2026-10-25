@@ -1,0 +1,25 @@
+# Build output
+/bin/
+/build/bin/
+*.exe
+cover.out
+
+# Wails build intermediates
+/.task/
+/build/linux/appimage/
+/build/linux/prism.desktop
+/build/windows/nsis/MicrosoftEdgeWebview2Setup.exe
+/cmd/prism/*.syso
+
+# Frontend
+/frontend/node_modules/
+/frontend/dist/
+/frontend/bindings/
+
+# Local spike output and secrets
+/spike-out/
+*.db
+.env
+
+# Release staging
+/dist/
