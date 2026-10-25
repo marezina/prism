@@ -1,0 +1,49 @@
+version: '3'
+
+vars:
+  APP_NAME: "prism"
+  BIN_DIR: "bin"
+  # The Wails app lives in cmd/prism (ARCHITECTURE §3), not the repo root.
+  MAIN_PKG: "./cmd/prism"
+  # Release builds set PRISM_VERSION (tag, e.g. v0.1.0) and PRISM_CLIENT_ID
+  # (the org OAuth App, docs/github-oauth-app-setup.md). Local builds are "dev".
+  VERSION: '{{.PRISM_VERSION | default "dev"}}'
+  VERSION_NUM:
+    sh: 'v="{{.PRISM_VERSION}}"; v="${v#v}"; v="${v%%-*}"; v="${v%%+*}"; case "$v" in [0-9]*.[0-9]*.[0-9]*) echo "$v";; *) echo 0.0.0;; esac'
+  # Full semver without "v" for packages (nfpm turns -beta.1 into ~beta.1).
+  VERSION_SEMVER:
+    sh: 'v="{{.PRISM_VERSION}}"; v="${v#v}"; case "$v" in [0-9]*.[0-9]*.[0-9]*) echo "$v";; *) echo 0.0.0;; esac'
+  CLIENT_ID: '{{.PRISM_CLIENT_ID | default ""}}'
+  # owner/name of the repo whose GitHub Releases ship PRism (update check).
+  UPDATE_REPO: '{{.PRISM_UPDATE_REPO | default ""}}'
+  PACKAGE_MANAGER: '{{.PACKAGE_MANAGER | default "npm"}}'
+  VITE_PORT: '{{.WAILS_VITE_PORT | default 9245}}'
+  # Target OS for build/package/run. Defaults to the host OS, and is overridden
+  # by `wails3 build GOOS=...` (or the GOOS env var) for cross-compilation.
+  GOOS: '{{.GOOS | default OS}}'
+
+includes:
+  common: ./build/Taskfile.yml
+  windows: ./build/windows/Taskfile.yml
+  linux: ./build/linux/Taskfile.yml
+
+tasks:
+  build:
+    summary: Builds the application
+    cmds:
+      - task: "{{.GOOS}}:build"
+
+  package:
+    summary: Packages a production build of the application
+    cmds:
+      - task: "{{.GOOS}}:package"
+
+  run:
+    summary: Runs the application
+    cmds:
+      - task: "{{.GOOS}}:run"
+
+  dev:
+    summary: Runs the application in development mode
+    cmds:
+      - wails3 dev -config ./build/config.yml -port {{.VITE_PORT}}

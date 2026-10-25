@@ -1,0 +1,129 @@
+name: release
+# Tag vX.Y.Z (or vX.Y.Z-beta.N) on main → build, package, (sign,) checksum and
+# publish a GitHub Release in this (internal) repo (release skill §CI).
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+env:
+  PRISM_VERSION: ${{ github.ref_name }}
+  PRISM_CLIENT_ID: ${{ vars.PRISM_CLIENT_ID }} # org OAuth App (docs/github-oauth-app-setup.md); not a secret
+  PRISM_UPDATE_REPO: ${{ github.repository }}
+  WAILS_VERSION: v3.0.0-beta.28 # ADR 0001
+
+jobs:
+  linux:
+    runs-on: ubuntu-24.04
+    env:
+      APPIMAGE_EXTRACT_AND_RUN: "1" # linuxdeploy without FUSE on the runner
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with: { go-version-file: go.mod }
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: npm, cache-dependency-path: frontend/package-lock.json }
+      - name: Linux deps
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential pkg-config libgtk-4-dev libwebkitgtk-6.0-dev file
+      - name: Install wails3
+        run: go install github.com/wailsapp/wails/v3/cmd/wails3@${WAILS_VERSION}
+      - name: Test
+        run: |
+          mkdir -p frontend/dist && touch frontend/dist/.keep
+          go test -count=1 ./...
+      - name: Package (AppImage + deb)
+        run: wails3 task linux:package
+      - name: Rename artifacts
+        run: |
+          v="${PRISM_VERSION#v}"
+          mkdir -p dist
+          mv bin/prism-x86_64.AppImage "dist/PRism-${v}-x86_64.AppImage"
+          mv bin/prism.deb "dist/prism_${v}_amd64.deb"
+      - uses: actions/upload-artifact@v4
+        with: { name: linux, path: dist/*, if-no-files-found: error }
+
+  windows:
+    runs-on: windows-latest
+    defaults: { run: { shell: bash } }
+    env:
+      # Authenticode signing runs only when the certificate secret is set
+      # (unsigned builds are acceptable for the internal beta, release skill).
+      HAS_CERT: ${{ secrets.WINDOWS_CERT_PFX_BASE64 != '' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with: { go-version-file: go.mod }
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: npm, cache-dependency-path: frontend/package-lock.json }
+      - name: Install wails3 and NSIS
+        run: |
+          go install github.com/wailsapp/wails/v3/cmd/wails3@${WAILS_VERSION}
+          choco install nsis -y --no-progress
+          echo "C:/Program Files (x86)/NSIS" >> "$GITHUB_PATH"
+      - name: Stamp version into the exe resources
+        run: |
+          v="${PRISM_VERSION#v}"; v="${v%%-*}"
+          sed -i "s/\"0\.0\.0\"/\"${v}\"/g" build/windows/info.json
+      - name: Build prism.exe
+        run: wails3 task windows:build
+      - name: Sign prism.exe
+        if: env.HAS_CERT == 'true'
+        env:
+          WINDOWS_CERT_PFX_BASE64: ${{ secrets.WINDOWS_CERT_PFX_BASE64 }}
+          WINDOWS_CERT_PASSWORD: ${{ secrets.WINDOWS_CERT_PASSWORD }}
+        shell: pwsh
+        run: |
+          [IO.File]::WriteAllBytes("$env:RUNNER_TEMP\cert.pfx", [Convert]::FromBase64String($env:WINDOWS_CERT_PFX_BASE64))
+          $signtool = Get-ChildItem "C:\Program Files (x86)\Windows Kits\10\bin\*\x64\signtool.exe" | Select-Object -Last 1
+          & $signtool.FullName sign /f "$env:RUNNER_TEMP\cert.pfx" /p $env:WINDOWS_CERT_PASSWORD /fd sha256 /tr http://timestamp.digicert.com /td sha256 bin\prism.exe
+      - name: Build installer
+        run: |
+          v="${PRISM_VERSION#v}"; v="${v%%-*}"
+          wails3 generate webview2bootstrapper -dir build/windows/nsis
+          cd build/windows/nsis
+          makensis -DINFO_PRODUCTVERSION="${v}" -DARG_WAILS_AMD64_BINARY="$GITHUB_WORKSPACE/bin/prism.exe" project.nsi
+      - name: Sign installer
+        if: env.HAS_CERT == 'true'
+        env:
+          WINDOWS_CERT_PFX_BASE64: ${{ secrets.WINDOWS_CERT_PFX_BASE64 }}
+          WINDOWS_CERT_PASSWORD: ${{ secrets.WINDOWS_CERT_PASSWORD }}
+        shell: pwsh
+        run: |
+          $signtool = Get-ChildItem "C:\Program Files (x86)\Windows Kits\10\bin\*\x64\signtool.exe" | Select-Object -Last 1
+          Get-ChildItem bin\PRism-*-setup.exe | ForEach-Object {
+            & $signtool.FullName sign /f "$env:RUNNER_TEMP\cert.pfx" /p $env:WINDOWS_CERT_PASSWORD /fd sha256 /tr http://timestamp.digicert.com /td sha256 $_.FullName
+          }
+      - name: Collect
+        run: |
+          v="${PRISM_VERSION#v}"
+          mkdir -p dist
+          mv bin/PRism-*-setup.exe "dist/PRism-${v}-windows-amd64-setup.exe"
+      - uses: actions/upload-artifact@v4
+        with: { name: windows, path: dist/*, if-no-files-found: error }
+
+  publish:
+    needs: [linux, windows]
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with: { path: dist, merge-multiple: true }
+      - name: Checksums
+        run: cd dist && sha256sum * > SHA256SUMS.txt && cat SHA256SUMS.txt
+      - name: Release notes from CHANGELOG.md
+        run: |
+          v="${PRISM_VERSION#v}"
+          awk -v v="$v" '$0 ~ "^## \\[" v "\\]" {on=1; next} on && /^## \[/ {exit} on' CHANGELOG.md > notes.md
+          [ -s notes.md ] || echo "See CHANGELOG.md." > notes.md
+          cat notes.md
+      - name: Publish
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          flags=""
+          case "$PRISM_VERSION" in *-*) flags="--prerelease";; esac
+          gh release create "$PRISM_VERSION" dist/* --title "PRism ${PRISM_VERSION}" --notes-file notes.md $flags

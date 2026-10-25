@@ -1,0 +1,11 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=PRism
+GenericName=Pull-request notifications
+Comment=GitHub pull-request notifications on your desktop
+Exec=prism
+Icon=prism
+Terminal=false
+Categories=Development;Utility;
+StartupWMClass=prism

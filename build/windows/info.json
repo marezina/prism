@@ -1,0 +1,15 @@
+{
+	"fixed": {
+		"file_version": "0.0.0"
+	},
+	"info": {
+		"0000": {
+			"ProductVersion": "0.0.0",
+			"CompanyName": "PRism",
+			"FileDescription": "GitHub pull-request notifications",
+			"LegalCopyright": "© 2026 PRism contributors",
+			"ProductName": "PRism",
+			"Comments": ""
+		}
+	}
+}

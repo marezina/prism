@@ -1,0 +1,74 @@
+name: ci
+on:
+  push: { branches: [main] }
+  pull_request:
+
+jobs:
+  go:
+    strategy:
+      fail-fast: false
+      matrix:
+        # Linux: Wails v3 uses GTK4 + WebKitGTK 6.0, first shipped in Ubuntu 24.04 (ADR 0001).
+        os: [ubuntu-24.04, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with: { go-version-file: go.mod }
+      - name: Linux deps
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential pkg-config libgtk-4-dev libwebkitgtk-6.0-dev
+      - name: Stub frontend/dist (embedded by cmd/prism; built in the frontend job)
+        shell: bash
+        run: mkdir -p frontend/dist && touch frontend/dist/.keep
+      - run: go vet ./...
+      - name: Test
+        run: go test -race -count=1 ./...
+      - name: Fixtures are sanitized
+        if: runner.os == 'Linux'
+        run: go run ./cmd/prism-cli sanitize-check
+      - name: Detector coverage gate
+        if: runner.os == 'Linux'
+        shell: bash
+        run: |
+          go test -coverprofile=cover.out ./internal/detect/...
+          pct=$(go tool cover -func=cover.out | awk '/^total:/ {gsub("%","",$3); print $3}')
+          echo "detect coverage: $pct%"
+          awk -v p="$pct" 'BEGIN { exit (p < 90) }'
+
+  lint:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with: { go-version-file: go.mod }
+      - name: Linux deps
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential pkg-config libgtk-4-dev libwebkitgtk-6.0-dev
+      - run: mkdir -p frontend/dist && touch frontend/dist/.keep
+      - uses: golangci/golangci-lint-action@v8
+        with: { version: v2.14.0 }
+
+  frontend:
+    runs-on: ubuntu-24.04
+    defaults: { run: { working-directory: frontend } }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with: { go-version-file: go.mod }
+      - name: Generate Wails bindings
+        working-directory: .
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential pkg-config libgtk-4-dev libwebkitgtk-6.0-dev
+          go install github.com/wailsapp/wails/v3/cmd/wails3@v3.0.0-beta.28
+          mkdir -p frontend/dist && touch frontend/dist/.keep
+          wails3 generate bindings -ts -i -clean=true ./cmd/prism
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: npm, cache-dependency-path: frontend/package-lock.json }
+      - run: npm ci
+      - run: npm run check
+      - run: npm run build

@@ -1,0 +1,39 @@
+name: Beta feedback
+description: Something wrong, missing or confusing in PRism
+labels: [beta]
+body:
+  - type: dropdown
+    id: kind
+    attributes:
+      label: What kind of feedback?
+      options:
+        - A notification was missing
+        - A notification came twice or was wrong
+        - Install / sign-in problem
+        - UI or wording
+        - Idea
+    validations: { required: true }
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened, and what did you expect?
+      description: For notification problems, link the PR and the comment or review (only colleagues can open it).
+    validations: { required: true }
+  - type: input
+    id: version
+    attributes:
+      label: PRism version
+      description: Settings → Advanced → Version
+    validations: { required: true }
+  - type: dropdown
+    id: os
+    attributes:
+      label: Operating system
+      options: [Windows 11, Ubuntu / Debian (GNOME), KDE Plasma, Other Linux]
+    validations: { required: true }
+  - type: textarea
+    id: log
+    attributes:
+      label: Log excerpt (optional)
+      description: Settings → Advanced → Open logs folder → prism.log. It contains no tokens, but check it before pasting.
+      render: text

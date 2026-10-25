@@ -1,0 +1,45 @@
+# PRism .deb (release skill §Linux). Built by `wails3 task linux:package`,
+# which sets PRISM_VERSION (semver without "v") and GOARCH.
+name: "prism"
+arch: ${GOARCH}
+platform: "linux"
+version: "${PRISM_VERSION}"
+section: "devel"
+priority: "optional"
+maintainer: "PRism maintainers <noreply@prism.invalid>"
+description: |
+  GitHub pull-request notifications in the system tray.
+  Needs a StatusNotifierItem host (KDE, or GNOME with the AppIndicator
+  extension) and a Secret Service (gnome-keyring or KWallet).
+vendor: "PRism"
+homepage: "https://github.com/"
+license: "Proprietary"
+release: "1"
+contents:
+  - src: "./bin/prism"
+    dst: "/usr/bin/prism"
+  - src: "./build/linux/prism.desktop"
+    dst: "/usr/share/applications/prism.desktop"
+  - src: "./assets/icons/png/app/prism-16.png"
+    dst: "/usr/share/icons/hicolor/16x16/apps/prism.png"
+  - src: "./assets/icons/png/app/prism-24.png"
+    dst: "/usr/share/icons/hicolor/24x24/apps/prism.png"
+  - src: "./assets/icons/png/app/prism-32.png"
+    dst: "/usr/share/icons/hicolor/32x32/apps/prism.png"
+  - src: "./assets/icons/png/app/prism-48.png"
+    dst: "/usr/share/icons/hicolor/48x48/apps/prism.png"
+  - src: "./assets/icons/png/app/prism-64.png"
+    dst: "/usr/share/icons/hicolor/64x64/apps/prism.png"
+  - src: "./assets/icons/png/app/prism-128.png"
+    dst: "/usr/share/icons/hicolor/128x128/apps/prism.png"
+  - src: "./assets/icons/png/app/prism-256.png"
+    dst: "/usr/share/icons/hicolor/256x256/apps/prism.png"
+  - src: "./assets/icons/png/app/prism-512.png"
+    dst: "/usr/share/icons/hicolor/512x512/apps/prism.png"
+depends:
+  - libgtk-4-1
+  - libwebkitgtk-6.0-4
+recommends:
+  - gnome-keyring
+scripts:
+  postinstall: "./build/linux/nfpm/scripts/postinstall.sh"
