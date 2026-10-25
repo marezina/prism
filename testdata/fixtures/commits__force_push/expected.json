@@ -1,0 +1,17 @@
+[
+  {
+    "type": "commits.after_my_review",
+    "dedupKey": "commits:PR_1:h9",
+    "prId": "PR_1",
+    "repo": "org-a/repo-a",
+    "prNumber": 7,
+    "prTitle": "w1 w2 w3",
+    "actor": {
+      "login": "carol",
+      "avatarUrl": "avatar://carol"
+    },
+    "summary": "force-pushed after your review",
+    "url": "https://github.example/org-a/repo-a/pull/7/files/h1..h9",
+    "occurredAt": "2026-10-20T10:18:00Z"
+  }
+]

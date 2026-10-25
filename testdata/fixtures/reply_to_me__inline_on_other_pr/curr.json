@@ -1,0 +1,52 @@
+{
+  "id": "PR_1",
+  "repo": "org-a/repo-a",
+  "number": 7,
+  "title": "w1 w2 w3",
+  "url": "https://github.example/org-a/repo-a/pull/7",
+  "author": {
+    "login": "alice",
+    "avatarUrl": "avatar://alice"
+  },
+  "state": "OPEN",
+  "headOid": "h1",
+  "baseOid": "b1",
+  "mergeable": "MERGEABLE",
+  "mergeStateStatus": "CLEAN",
+  "commitsTotal": 1,
+  "reviews": [],
+  "comments": [],
+  "threads": [
+    {
+      "id": "PRRT_1",
+      "path": "p1/p9.go",
+      "comments": [
+        {
+          "id": "PRRC_271",
+          "databaseId": 271,
+          "body": "w23",
+          "url": "https://github.example/org-a/repo-a/pull/7#discussion_r271",
+          "createdAt": "2026-10-20T10:02:00Z",
+          "author": {
+            "login": "me",
+            "avatarUrl": "avatar://me"
+          }
+        },
+        {
+          "id": "PRRC_272",
+          "databaseId": 272,
+          "body": "w24",
+          "url": "https://github.example/org-a/repo-a/pull/7#discussion_r272",
+          "createdAt": "2026-10-20T10:05:00Z",
+          "author": {
+            "login": "alice",
+            "avatarUrl": "avatar://alice"
+          },
+          "replyToId": "PRRC_271"
+        }
+      ]
+    }
+  ],
+  "reviewRequests": [],
+  "timeline": []
+}

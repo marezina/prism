@@ -1,0 +1,18 @@
+[
+  {
+    "type": "comment.reply_to_me",
+    "dedupKey": "comment:262",
+    "prId": "PR_1",
+    "repo": "org-a/repo-a",
+    "prNumber": 7,
+    "prTitle": "w1 w2 w3",
+    "actor": {
+      "login": "alice",
+      "avatarUrl": "avatar://alice"
+    },
+    "summary": "replied to your comment",
+    "url": "https://github.example/org-a/repo-a/pull/7#discussion_r262",
+    "occurredAt": "2026-10-20T10:05:00Z",
+    "excerpt": "w22"
+  }
+]

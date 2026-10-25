@@ -1,0 +1,9 @@
+{
+  "me": "me",
+  "ignoreBots": true,
+  "firstSeen": false,
+  "note": "hand-written: request for a team I belong to",
+  "teams": [
+    "org-a/team-a"
+  ]
+}

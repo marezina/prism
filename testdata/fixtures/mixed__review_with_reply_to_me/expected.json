@@ -1,0 +1,50 @@
+[
+  {
+    "type": "comment.reply_to_me",
+    "dedupKey": "comment:502",
+    "prId": "PR_1",
+    "repo": "org-a/repo-a",
+    "prNumber": 7,
+    "prTitle": "w1 w2 w3",
+    "actor": {
+      "login": "alice",
+      "avatarUrl": "avatar://alice"
+    },
+    "summary": "replied to your comment",
+    "url": "https://github.example/org-a/repo-a/pull/7#discussion_r502",
+    "occurredAt": "2026-10-20T10:05:00Z",
+    "excerpt": "w52"
+  },
+  {
+    "type": "my_pr.changes_requested",
+    "dedupKey": "review:120",
+    "prId": "PR_1",
+    "repo": "org-a/repo-a",
+    "prNumber": 7,
+    "prTitle": "w1 w2 w3",
+    "actor": {
+      "login": "alice",
+      "avatarUrl": "avatar://alice"
+    },
+    "summary": "requested changes on your PR",
+    "url": "https://github.example/org-a/repo-a/pull/7#pullrequestreview-120",
+    "occurredAt": "2026-10-20T10:05:00Z",
+    "excerpt": "w51"
+  },
+  {
+    "type": "my_pr.comment",
+    "dedupKey": "comment:601",
+    "prId": "PR_1",
+    "repo": "org-a/repo-a",
+    "prNumber": 7,
+    "prTitle": "w1 w2 w3",
+    "actor": {
+      "login": "bob",
+      "avatarUrl": "avatar://bob"
+    },
+    "summary": "commented on your PR",
+    "url": "https://github.example/org-a/repo-a/pull/7#issuecomment-601",
+    "occurredAt": "2026-10-20T10:09:00Z",
+    "excerpt": "w54"
+  }
+]

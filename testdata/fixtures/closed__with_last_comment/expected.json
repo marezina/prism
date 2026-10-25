@@ -1,0 +1,32 @@
+[
+  {
+    "type": "my_pr.comment",
+    "dedupKey": "comment:701",
+    "prId": "PR_1",
+    "repo": "org-a/repo-a",
+    "prNumber": 7,
+    "prTitle": "w1 w2 w3",
+    "actor": {
+      "login": "alice",
+      "avatarUrl": "avatar://alice"
+    },
+    "summary": "commented on your PR",
+    "url": "https://github.example/org-a/repo-a/pull/7#issuecomment-701",
+    "occurredAt": "2026-10-20T10:29:00Z",
+    "excerpt": "w60"
+  },
+  {
+    "type": "my_pr.closed",
+    "dedupKey": "closed:PR_1",
+    "prId": "PR_1",
+    "repo": "org-a/repo-a",
+    "prNumber": 7,
+    "prTitle": "w1 w2 w3",
+    "actor": {
+      "login": ""
+    },
+    "summary": "your PR was merged",
+    "url": "https://github.example/org-a/repo-a/pull/7",
+    "occurredAt": "2026-10-20T10:30:00Z"
+  }
+]

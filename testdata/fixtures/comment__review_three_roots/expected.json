@@ -1,0 +1,18 @@
+[
+  {
+    "type": "my_pr.comment",
+    "dedupKey": "review:104",
+    "prId": "PR_1",
+    "repo": "org-a/repo-a",
+    "prNumber": 7,
+    "prTitle": "w1 w2 w3",
+    "actor": {
+      "login": "alice",
+      "avatarUrl": "avatar://alice"
+    },
+    "summary": "left 3 comments on your PR",
+    "url": "https://github.example/org-a/repo-a/pull/7#discussion_r211",
+    "occurredAt": "2026-10-20T10:05:00Z",
+    "excerpt": "w12"
+  }
+]

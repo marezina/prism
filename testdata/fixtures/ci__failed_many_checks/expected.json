@@ -1,0 +1,16 @@
+[
+  {
+    "type": "ci.failed",
+    "dedupKey": "ci:PR_1:h1:fail",
+    "prId": "PR_1",
+    "repo": "org-a/repo-a",
+    "prNumber": 7,
+    "prTitle": "w1 w2 w3",
+    "actor": {
+      "login": ""
+    },
+    "summary": "CI failed: c1, c2, c3 +2 more",
+    "url": "https://ci.example/c1",
+    "occurredAt": "2026-10-20T10:05:00Z"
+  }
+]

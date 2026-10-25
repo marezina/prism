@@ -1,0 +1,59 @@
+{
+  "id": "PR_1",
+  "repo": "org-a/repo-a",
+  "number": 7,
+  "title": "w1 w2 w3",
+  "url": "https://github.example/org-a/repo-a/pull/7",
+  "author": {
+    "login": "me",
+    "avatarUrl": "avatar://me"
+  },
+  "state": "OPEN",
+  "headOid": "h1",
+  "baseOid": "b1",
+  "mergeable": "MERGEABLE",
+  "mergeStateStatus": "CLEAN",
+  "commitsTotal": 1,
+  "reviews": [],
+  "comments": [],
+  "threads": [],
+  "reviewRequests": [],
+  "timeline": [],
+  "createdAt": "2026-10-20T10:00:00Z",
+  "updatedAt": "2026-10-20T10:20:00Z",
+  "ci": {
+    "state": "FAILURE",
+    "checks": [
+      {
+        "name": "c1",
+        "state": "FAILURE",
+        "url": "https://ci.example/c1",
+        "at": "2026-10-20T10:01:00Z"
+      },
+      {
+        "name": "c2",
+        "state": "FAILURE",
+        "url": "https://ci.example/c2",
+        "at": "2026-10-20T10:02:00Z"
+      },
+      {
+        "name": "c3",
+        "state": "FAILURE",
+        "url": "https://ci.example/c3",
+        "at": "2026-10-20T10:03:00Z"
+      },
+      {
+        "name": "c4",
+        "state": "FAILURE",
+        "url": "https://ci.example/c4",
+        "at": "2026-10-20T10:04:00Z"
+      },
+      {
+        "name": "c5",
+        "state": "ERROR",
+        "url": "https://ci.example/c5",
+        "at": "2026-10-20T10:05:00Z"
+      }
+    ]
+  }
+}

@@ -1,0 +1,90 @@
+{
+  "id": "PR_1",
+  "repo": "org-a/repo-a",
+  "number": 7,
+  "title": "w1 w2 w3",
+  "url": "https://github.example/org-a/repo-a/pull/7",
+  "author": {
+    "login": "me",
+    "avatarUrl": "avatar://me"
+  },
+  "state": "OPEN",
+  "headOid": "h1",
+  "baseOid": "b1",
+  "mergeable": "MERGEABLE",
+  "mergeStateStatus": "CLEAN",
+  "commitsTotal": 1,
+  "reviews": [
+    {
+      "id": "PRR_104",
+      "databaseId": 104,
+      "state": "COMMENTED",
+      "url": "https://github.example/org-a/repo-a/pull/7#pullrequestreview-104",
+      "author": {
+        "login": "alice",
+        "avatarUrl": "avatar://alice"
+      },
+      "commitOid": "h1",
+      "submittedAt": "2026-10-20T10:05:00Z"
+    }
+  ],
+  "comments": [],
+  "threads": [
+    {
+      "id": "PRRT_1",
+      "path": "p1/p9.go",
+      "comments": [
+        {
+          "id": "PRRC_211",
+          "databaseId": 211,
+          "body": "w12",
+          "url": "https://github.example/org-a/repo-a/pull/7#discussion_r211",
+          "createdAt": "2026-10-20T10:05:00Z",
+          "author": {
+            "login": "alice",
+            "avatarUrl": "avatar://alice"
+          },
+          "reviewDatabaseId": 104
+        }
+      ]
+    },
+    {
+      "id": "PRRT_2",
+      "path": "p2/p9.go",
+      "comments": [
+        {
+          "id": "PRRC_212",
+          "databaseId": 212,
+          "body": "w13",
+          "url": "https://github.example/org-a/repo-a/pull/7#discussion_r212",
+          "createdAt": "2026-10-20T10:05:00Z",
+          "author": {
+            "login": "alice",
+            "avatarUrl": "avatar://alice"
+          },
+          "reviewDatabaseId": 104
+        }
+      ]
+    },
+    {
+      "id": "PRRT_3",
+      "path": "p3/p9.go",
+      "comments": [
+        {
+          "id": "PRRC_213",
+          "databaseId": 213,
+          "body": "w14",
+          "url": "https://github.example/org-a/repo-a/pull/7#discussion_r213",
+          "createdAt": "2026-10-20T10:05:00Z",
+          "author": {
+            "login": "alice",
+            "avatarUrl": "avatar://alice"
+          },
+          "reviewDatabaseId": 104
+        }
+      ]
+    }
+  ],
+  "reviewRequests": [],
+  "timeline": []
+}

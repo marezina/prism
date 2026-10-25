@@ -1,0 +1,17 @@
+[
+  {
+    "type": "my_pr.opened",
+    "dedupKey": "opened:PR_1",
+    "prId": "PR_1",
+    "repo": "org-a/repo-a",
+    "prNumber": 7,
+    "prTitle": "w1 w2 w3",
+    "actor": {
+      "login": "me",
+      "avatarUrl": "avatar://me"
+    },
+    "summary": "you opened a PR",
+    "url": "https://github.example/org-a/repo-a/pull/7",
+    "occurredAt": "0001-01-01T00:00:00Z"
+  }
+]

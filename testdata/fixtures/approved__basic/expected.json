@@ -1,0 +1,17 @@
+[
+  {
+    "type": "my_pr.approved",
+    "dedupKey": "review:101",
+    "prId": "PR_1",
+    "repo": "org-a/repo-a",
+    "prNumber": 7,
+    "prTitle": "w1 w2 w3",
+    "actor": {
+      "login": "alice",
+      "avatarUrl": "avatar://alice"
+    },
+    "summary": "approved your PR",
+    "url": "https://github.example/org-a/repo-a/pull/7#pullrequestreview-101",
+    "occurredAt": "2026-10-20T10:05:00Z"
+  }
+]

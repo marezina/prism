@@ -1,0 +1,9 @@
+{
+  "me": "me",
+  "ignoreBots": true,
+  "firstSeen": false,
+  "note": "hand-written: request older than the fetched timeline: fallback key, PR updatedAt",
+  "teams": [
+    "org-a/team-a"
+  ]
+}

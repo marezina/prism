@@ -1,0 +1,45 @@
+{
+  "id": "PR_1",
+  "repo": "org-a/repo-a",
+  "number": 7,
+  "title": "w1 w2 w3",
+  "url": "https://github.example/org-a/repo-a/pull/7",
+  "author": {
+    "login": "alice",
+    "avatarUrl": "avatar://alice"
+  },
+  "state": "OPEN",
+  "headOid": "h1",
+  "baseOid": "b1",
+  "mergeable": "MERGEABLE",
+  "mergeStateStatus": "CLEAN",
+  "commitsTotal": 1,
+  "reviews": [],
+  "comments": [
+    {
+      "id": "IC_401",
+      "databaseId": 401,
+      "body": "w31 w32 w33\nw34",
+      "url": "https://github.example/org-a/repo-a/pull/7#issuecomment-401",
+      "createdAt": "2026-10-20T10:01:00Z",
+      "author": {
+        "login": "me",
+        "avatarUrl": "avatar://me"
+      }
+    },
+    {
+      "id": "IC_402",
+      "databaseId": 402,
+      "body": "> w31 w32 w33\n\nw35",
+      "url": "https://github.example/org-a/repo-a/pull/7#issuecomment-402",
+      "createdAt": "2026-10-20T10:05:00Z",
+      "author": {
+        "login": "bob",
+        "avatarUrl": "avatar://bob"
+      }
+    }
+  ],
+  "threads": [],
+  "reviewRequests": [],
+  "timeline": []
+}

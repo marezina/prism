@@ -1,0 +1,36 @@
+{
+  "id": "PR_1",
+  "repo": "org-a/repo-a",
+  "number": 7,
+  "title": "w1 w2 w3",
+  "url": "https://github.example/org-a/repo-a/pull/7",
+  "author": {
+    "login": "me",
+    "avatarUrl": "avatar://me"
+  },
+  "state": "OPEN",
+  "headOid": "h1",
+  "baseOid": "b1",
+  "mergeable": "MERGEABLE",
+  "mergeStateStatus": "CLEAN",
+  "commitsTotal": 1,
+  "reviews": [
+    {
+      "id": "PRR_101",
+      "databaseId": 101,
+      "state": "APPROVED",
+      "body": "w4",
+      "url": "https://github.example/org-a/repo-a/pull/7#pullrequestreview-101",
+      "author": {
+        "login": "alice",
+        "avatarUrl": "avatar://alice"
+      },
+      "commitOid": "h1",
+      "submittedAt": "2026-10-20T10:05:00Z"
+    }
+  ],
+  "comments": [],
+  "threads": [],
+  "reviewRequests": [],
+  "timeline": []
+}

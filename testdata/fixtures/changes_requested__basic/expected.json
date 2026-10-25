@@ -1,0 +1,18 @@
+[
+  {
+    "type": "my_pr.changes_requested",
+    "dedupKey": "review:102",
+    "prId": "PR_1",
+    "repo": "org-a/repo-a",
+    "prNumber": 7,
+    "prTitle": "w1 w2 w3",
+    "actor": {
+      "login": "bob",
+      "avatarUrl": "avatar://bob"
+    },
+    "summary": "requested changes on your PR",
+    "url": "https://github.example/org-a/repo-a/pull/7#pullrequestreview-102",
+    "occurredAt": "2026-10-20T10:05:00Z",
+    "excerpt": "w6 w7"
+  }
+]

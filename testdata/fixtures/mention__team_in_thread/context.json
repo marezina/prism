@@ -1,0 +1,9 @@
+{
+  "me": "me",
+  "ignoreBots": true,
+  "firstSeen": false,
+  "note": "hand-written: team mention in a review thread",
+  "teams": [
+    "org-a/team-a"
+  ]
+}

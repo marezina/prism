@@ -1,0 +1,16 @@
+[
+  {
+    "type": "ci.passed",
+    "dedupKey": "ci:PR_1:h1:ok",
+    "prId": "PR_1",
+    "repo": "org-a/repo-a",
+    "prNumber": 7,
+    "prTitle": "w1 w2 w3",
+    "actor": {
+      "login": ""
+    },
+    "summary": "CI passed",
+    "url": "https://github.example/org-a/repo-a/pull/7/checks",
+    "occurredAt": "2026-10-20T10:16:00Z"
+  }
+]
