@@ -8,8 +8,6 @@ inside the same GitHub organization.
 ## Read before working
 - `docs/SPEC.md` — product spec: event catalog, detection rules, lifecycle, settings.
 - `docs/ARCHITECTURE.md` — packages, data flow, DB schema, polling model.
-- `docs/PLAN.md` — phased implementation plan. Work phase by phase; do not start a
-  phase before the previous phase's "Definition of done" is met.
 - Skills in `.claude/skills/` — load the relevant one before touching that area:
   - `github-api` — any GitHub REST/GraphQL/auth code
   - `event-detector` — adding or changing an event type / detection logic
@@ -42,6 +40,5 @@ inside the same GitHub organization.
 - `go run ./cmd/prism-cli verify-search` — check search qualifier semantics (ADR 0005)
 - `go run ./cmd/prism-cli watch` — headless poller printing events (dev)
 - `go run ./cmd/prism-cli record --pr owner/repo#123` — record a sanitized fixture
-- `go run ./cmd/prism-spike <badge|keyring|sound>` — Phase 0 platform spikes
 - `wails3 dev` — run the app with hot reload
 - `wails3 task build` — production build for current OS

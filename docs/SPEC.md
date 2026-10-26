@@ -45,7 +45,7 @@ Review events (`my_pr.approved`, `my_pr.changes_requested`) outrank all of them 
 An approve / changes-requested review with a body produces only the review event; its
 body is shown as the excerpt.
 
-Clarifications (agreed for Phase 3; change here first if the behaviour should change):
+Clarifications (change here first if the behaviour should change):
 - **One review submission → one review event.** New threads started by a review (thread
   roots whose comment belongs to that review) are folded into the review's event —
   `my_pr.approved`, `my_pr.changes_requested`, or `my_pr.comment` keyed `review:<id>` for a

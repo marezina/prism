@@ -2,10 +2,12 @@
 
 All notable user-visible changes. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 versions: [SemVer](https://semver.org/). Before tagging, rename `[Unreleased]` to the
-version (e.g. `[0.1.0-beta.1] - 2026-11-02`); the release workflow uses that section
+version (e.g. `[1.1.0] - 2026-11-02`); the release workflow uses that section
 as the release notes.
 
 ## [Unreleased]
+
+## [1.0.0] - 2026-10-26
 
 ### Added
 - Tray app for Windows 11 and Linux with an unread badge, offline state and a menu
@@ -21,7 +23,10 @@ as the release notes.
 - Toasts with avatar and "Open PR" / "Mark as read"; bursts of 3+ become one summary;
   sounds at most every 5 s; quiet hours, Do Not Disturb and a 1-hour pause.
 - Popup with tabs (All, My PRs, Reviews, Mentions, CI), PRs grouped, keyboard control
-  (↑/↓, Enter, E, Esc), light and dark theme.
-- Settings for every event (list / toast / sound), sounds, poll interval, bots,
-  drafts, quiet hours, start at login, theme; "Reset local data".
+  (↑/↓, Enter, E, Esc), light and dark theme. Clicking a comment, reply or mention opens
+  it on GitHub; clicking any other notification marks it read; the PR title opens the PR.
+- Refresh button spins while a sync is running.
+- Settings for every event (list / toast / sound; grouped by Your PRs, Checks and
+  merging, Other PRs), sounds, poll interval, bots, drafts, quiet hours, start at login,
+  theme; "Reset local data".
 - Update check against the internal release repo.

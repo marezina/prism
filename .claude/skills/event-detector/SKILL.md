@@ -72,7 +72,7 @@ counters, never timestamps from the local clock) so restarts are idempotent.
 - `mergeable: UNKNOWN` never emits and never clears a previous CONFLICTING state.
 - Deleted comment in `curr` that exists in `prev` → no event (store handles cleanup).
 
-## Scenarios to record (Phase 2)
+## Scenarios to record
 approve; changes requested; approve with body; plain comment; review with 3 inline
 comments; reply in thread by colleague to colleague on my PR; reply to my inline comment
 on my PR; reply to my inline comment on other PR; quote-reply in conversation; @mention

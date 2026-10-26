@@ -1,6 +1,6 @@
-name: Beta feedback
+name: Feedback
 description: Something wrong, missing or confusing in PRism
-labels: [beta]
+labels: [feedback]
 body:
   - type: dropdown
     id: kind

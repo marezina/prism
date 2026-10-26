@@ -35,7 +35,7 @@ func (c *cli) search(ctx context.Context, args []string) error {
 	return nil
 }
 
-// verifySearch answers PLAN Phase 1 ⚠: are several org:/user: qualifiers in one
+// verifySearch answers ADR 0005: are several org:/user: qualifiers in one
 // search OR-ed, and does @me work in GraphQL search? It compares the combined
 // query with one query per owner, and @me with the literal login.
 func (c *cli) verifySearch(ctx context.Context, args []string) error {

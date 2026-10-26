@@ -18,7 +18,7 @@ type Player interface { Play(name string, volume float64) error }
 type Autostart interface { Enable() error; Disable() error; IsEnabled() (bool, error) }
 ```
 
-The concrete libraries are chosen in Phase 0 spikes and recorded in `docs/adr/`.
+The concrete libraries are recorded in `docs/adr/`.
 Read those ADRs first; this skill lists requirements and known traps.
 
 ## Tray
@@ -43,7 +43,7 @@ Read those ADRs first; this skill lists requirements and known traps.
   show and stay in Notification Center. Installer creates it; dev mode registers it on
   startup. Use one constant AUMID: `PRism.Desktop`.
 - Activation (button clicks while the app runs in background) requires a COM
-  activator or protocol activation (`prism://action?...`). Whichever the spike picked,
+  activator or protocol activation (`prism://action?...`). Whichever ADR 0002 picked,
   route both into `OnAction`. If the app was not running, the activation must start it
   and still perform the action.
 - Images: local file paths only (avatars from `internal/avatar` cache).
