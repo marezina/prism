@@ -7,6 +7,18 @@ as the release notes.
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-10-26
+
+### Added
+- Mute a noisy PR from its group in the list: its notifications are cleared and it
+  stays silent until it closes. Muted PRs are listed under Settings → Muted PRs.
+- Each PR group shows its current status: draft, approvals, changes requested,
+  CI passing / failing / running and merge conflicts.
+
+### Changed
+- Notifications and PR groups slide in and out; views and hovers ease. Animations are
+  off when the system asks for reduced motion.
+
 ## [1.0.0] - 2026-10-26
 
 ### Added

@@ -287,11 +287,12 @@ func (p *Poller) refresh(ctx context.Context, ids []string, states map[string]st
 	var events []model.Event
 	for _, curr := range res.PRs {
 		var prev *model.PRSnapshot
-		if s, ok := states[curr.ID]; ok {
+		s, ok := states[curr.ID]
+		if ok {
 			prev = s.Snapshot
 		}
 		for _, e := range detect.Diff(prev, curr, p.detectContext(st, prev == nil)) {
-			if !firstRun || e.Type == model.ReviewRequested {
+			if (!firstRun || e.Type == model.ReviewRequested) && !s.Muted {
 				events = append(events, e)
 			}
 		}
@@ -368,7 +369,7 @@ func (p *Poller) handleLeft(ctx context.Context, set watch.Set, states map[strin
 			continue // try again next cycle
 		}
 		final := res.PRs[id]
-		if final != nil && final.State != model.PROpen && !firstRun {
+		if final != nil && final.State != model.PROpen && !firstRun && !states[id].Muted {
 			events = append(events, detect.Diff(states[id].Snapshot, final, p.detectContext(st, false))...)
 		}
 		// Purge before recording: purge deletes the PR's tombstones, and the

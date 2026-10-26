@@ -130,3 +130,7 @@ select.field { padding-right: var(--space-2); }
 }
 @keyframes spin { to { transform: rotate(360deg); } }
 @media (prefers-reduced-motion: reduce) { .spinner { animation-duration: 3s; } }
+
+/* Hover and focus feedback eases in; off when the OS asks for reduced motion. */
+.btn, .icon-btn, .link, button.row { transition: background-color 120ms ease, color 120ms ease, border-color 120ms ease; }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition-duration: 0s !important; } }

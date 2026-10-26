@@ -1,10 +1,12 @@
 <script lang="ts">
   // The popup's main view: unread notifications grouped by PR (prism-ui skill).
   import { onDestroy, onMount, tick as nextTick } from 'svelte'
+  import { slide } from 'svelte/transition'
   import { Api, Events, errorText, type Notification, type SyncStatus } from '../lib/api'
   import Avatar from '../lib/Avatar.svelte'
   import Icon from '../lib/Icon.svelte'
-  import { groupByPR, inTab, opensLink, showsExcerpt, tabs, visual, type TabId } from '../lib/events'
+  import { groupByPR, inTab, opensLink, showsExcerpt, statusChips, tabs, visual, type TabId } from '../lib/events'
+  import { motion } from '../lib/motion'
   import { relative, tick } from '../lib/time'
 
   let { onsettings }: { onsettings: () => void } = $props()
@@ -59,6 +61,8 @@
   const activate = (n: Notification) => (opensLink(n.type) ? open(n) : markRead(n))
   const markPR = (prId: string) =>
     remove(items.filter((n) => n.prId === prId).map((n) => n.id), () => Api.MarkPRRead(prId))
+  const mutePR = (prId: string) =>
+    remove(items.filter((n) => n.prId === prId).map((n) => n.id), () => Api.MutePR(prId))
   const markAll = () => remove(items.map((n) => n.id), () => Api.MarkAllRead())
 
   // Keyboard: ↑/↓ move between rows, Enter opens (native button), E marks read.
@@ -134,6 +138,9 @@
 
   {#if error}<p class="notice notice-error err" role="alert">{error}</p>{/if}
 
+  <!-- Keyed by tab: switching tabs swaps the list instantly; rows and groups
+       animate only when they arrive or are read within a tab. -->
+  {#key tab}
   <div class="list" bind:this={listEl}>
     {#if loaded && groups.length === 0}
       <div class="empty">
@@ -144,7 +151,8 @@
     {/if}
 
     {#each groups as g (g.prId)}
-      <section class="group" aria-label="{g.repo} #{g.number}">
+      {@const chips = statusChips(g.status)}
+      <section class="group" aria-label="{g.repo} #{g.number}" transition:slide={motion(180)}>
         <div class="group-head">
           <div class="pr">
             <div class="repo-line">
@@ -154,14 +162,28 @@
             <button class="pr-title" title="Open the PR" onclick={() => Api.OpenURL(g.url)}>
               <span class="num">#{g.number}</span> <span class="title">{g.title}</span>
             </button>
+            {#if chips.length > 0}
+              <ul class="chips" aria-label="PR status">
+                {#each chips as c (c.label)}
+                  <li class="chip fg-{c.tint ?? 'none'}">
+                    {#if c.icon}<Icon name={c.icon} size={12} />{/if}{c.label}
+                  </li>
+                {/each}
+              </ul>
+            {/if}
           </div>
+          {#if g.status}
+            <button class="icon-btn" aria-label="Mute PR" title="Mute this PR until it closes"
+                    onclick={() => mutePR(g.prId)}><Icon name="bell-off" /></button>
+          {/if}
           <button class="btn btn-secondary btn-small" onclick={() => markPR(g.prId)}>Mark PR read</button>
         </div>
 
         {#each g.items as n (n.id)}
           {@const v = visual(n.type)}
           {@const link = opensLink(n.type)}
-          <button class="row" data-row={n.id} title={link ? 'Open comment' : 'Mark as read'} onclick={() => activate(n)}>
+          <button class="row" data-row={n.id} title={link ? 'Open comment' : 'Mark as read'} onclick={() => activate(n)}
+                  transition:slide={motion(160)}>
             {#if v.kind === 'icon'}
               <span class="tile tint-{v.tint}"><Icon name={v.icon} /></span>
             {:else if n.actorAvatar || n.actorLogin}
@@ -184,6 +206,7 @@
       </section>
     {/each}
   </div>
+  {/key}
 
   <footer class="foot">
     <span class="muted">
@@ -383,6 +406,25 @@
   .row:hover {
     background: var(--hover);
   }
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-1) var(--space-3);
+    margin: var(--space-1) 0 0;
+    padding: 0;
+    list-style: none;
+  }
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    font-size: 12px;
+    line-height: 16px;
+    color: var(--text-3);
+  }
+  .fg-green { color: var(--green-fg); }
+  .fg-red { color: var(--red-fg); }
+  .fg-orange { color: var(--orange-fg); }
   .tile {
     width: 28px;
     height: 28px;

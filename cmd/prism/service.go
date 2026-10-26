@@ -46,6 +46,19 @@ func (s *AppService) MarkPRRead(ctx context.Context, prID string) error {
 // MarkAllRead marks everything read.
 func (s *AppService) MarkAllRead(ctx context.Context) error { return s.core.MarkAllRead(ctx) }
 
+// MutePR silences a PR until it is closed or unmuted.
+func (s *AppService) MutePR(ctx context.Context, prID string) error { return s.core.MutePR(ctx, prID) }
+
+// UnmutePR lets a muted PR notify again.
+func (s *AppService) UnmutePR(ctx context.Context, prID string) error {
+	return s.core.UnmutePR(ctx, prID)
+}
+
+// MutedPRs lists the muted PRs for Settings.
+func (s *AppService) MutedPRs(ctx context.Context) ([]app.MutedPR, error) {
+	return s.core.MutedPRs(ctx)
+}
+
 // Open opens a notification's link and marks it read.
 func (s *AppService) Open(ctx context.Context, id int64) error { return s.core.Open(ctx, id) }
 

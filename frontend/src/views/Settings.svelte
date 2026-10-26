@@ -1,12 +1,14 @@
 <script lang="ts">
-  // Settings (SPEC §7): Account, Organizations, Events, Sound, Behavior,
-  // Appearance, Advanced. Every change is saved right away.
+  // Settings (SPEC §7): Account, Organizations, Events, Muted PRs, Sound,
+  // Behavior, Appearance, Advanced. Every change is saved right away.
   import { onDestroy, onMount } from 'svelte'
-  import { Api, errorText, type AuthState, type Flags, type Settings } from '../lib/api'
+  import { slide } from 'svelte/transition'
+  import { Api, errorText, type AuthState, type Flags, type MutedPR, type Settings } from '../lib/api'
   import Avatar from '../lib/Avatar.svelte'
   import Icon from '../lib/Icon.svelte'
   import Toggle from '../lib/Toggle.svelte'
   import { eventGroups } from '../lib/events'
+  import { motion } from '../lib/motion'
   import { setTheme } from '../lib/theme'
   import OrgPicker from './OrgPicker.svelte'
 
@@ -20,6 +22,16 @@
   let saved = $state(false)
   let timer: ReturnType<typeof setTimeout> | undefined
   let confirmReset = $state(false)
+  let muted: MutedPR[] = $state([])
+
+  async function unmute(pr: MutedPR) {
+    try {
+      await Api.UnmutePR(pr.prId)
+      muted = muted.filter((m) => m.prId !== pr.prId)
+    } catch (e) {
+      error = errorText(e)
+    }
+  }
 
   async function reset() {
     if (!confirmReset) {
@@ -38,6 +50,7 @@
     try {
       ;[st, sounds, version] = await Promise.all([Api.Settings(), Api.SoundNames().then((s) => s ?? []), Api.Version()])
       newer = await Api.Update()
+      muted = (await Api.MutedPRs()) ?? []
     } catch (e) {
       error = errorText(e)
     }
@@ -134,6 +147,25 @@
             {/each}
           {/each}
         </div>
+      </section>
+
+      <section>
+        <h2>Muted PRs</h2>
+        {#if muted.length === 0}
+          <p class="meta">None. Mute a noisy PR with the bell button in the list; it stays muted until it closes.</p>
+        {:else}
+          <ul class="muted-list">
+            {#each muted as pr (pr.prId)}
+              <li class="line" transition:slide={motion(160)}>
+                <button class="grow pr-link" title="Open the PR" onclick={() => Api.OpenURL(pr.url)}>
+                  <span class="meta block">{pr.repo}</span>
+                  <span class="ellipsis"><span class="muted">#{pr.number}</span> {pr.title}</span>
+                </button>
+                <button class="btn btn-secondary btn-small" onclick={() => unmute(pr)}>Unmute</button>
+              </li>
+            {/each}
+          </ul>
+        {/if}
       </section>
 
       <section>
@@ -307,6 +339,33 @@
   }
   .block {
     display: block;
+  }
+  .muted-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+  p.meta {
+    margin: 0;
+  }
+  .pr-link {
+    border: none;
+    background: none;
+    padding: 0;
+    text-align: left;
+    cursor: pointer;
+  }
+  .pr-link:hover .ellipsis {
+    text-decoration: underline;
+  }
+  .ellipsis {
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
   .events {
     display: flex;

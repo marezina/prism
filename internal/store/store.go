@@ -92,6 +92,8 @@ var migrations = []string{
 	);
 	CREATE INDEX tombstones_pr ON tombstones(pr_id);
 	CREATE TABLE avatars (login TEXT PRIMARY KEY, path TEXT NOT NULL, etag TEXT, fetched_at TEXT NOT NULL);`,
+	// v2: a muted PR records no events until it is unmuted or leaves the watch set.
+	`ALTER TABLE pr_state ADD COLUMN muted INTEGER NOT NULL DEFAULT 0;`,
 }
 
 func (s *Store) migrate(ctx context.Context) error {

@@ -5,7 +5,6 @@ import (
 	"errors"
 
 	"prism/internal/notify"
-	"prism/internal/store"
 )
 
 // Unread returns every unread notification, newest first.
@@ -18,13 +17,9 @@ func (c *Core) Unread(ctx context.Context) ([]Notification, error) {
 	if err != nil {
 		return nil, err
 	}
-	mine := map[string]bool{}
-	for id, s := range states {
-		mine[id] = s.Role == store.RoleMine
-	}
 	out := make([]Notification, 0, len(list))
 	for _, n := range list {
-		out = append(out, c.toDTO(n, mine))
+		out = append(out, c.toDTO(n, states[n.PRID]))
 	}
 	return out, nil
 }

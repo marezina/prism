@@ -460,3 +460,59 @@ func TestFirstRunListsPendingReviewRequestsQuietly(t *testing.T) {
 		t.Fatalf("second run fresh = %+v", h.events)
 	}
 }
+
+func TestMutedPRRecordsNothingUntilUnmuted(t *testing.T) {
+	h := newHarness(t)
+	ctx := context.Background()
+	h.gh.prs["PR_1"], h.gh.inSet["PR_1"] = myPR("PR_1", "acme/api", 1), true
+	h.cycle()
+	if err := h.store.SetMuted(ctx, "PR_1", true); err != nil {
+		t.Fatal(err)
+	}
+	comment := func(dbID int64) {
+		h.gh.edit("PR_1", func(p *model.PRSnapshot) {
+			p.Comments = append(p.Comments, model.Comment{ID: "IC_" + strings.Repeat("x", int(dbID)), DatabaseID: dbID,
+				Body: "hi", URL: "u", CreatedAt: t0, Author: model.Actor{Login: "bob"}})
+		})
+	}
+	comment(1)
+	h.cycle()
+	if got := h.takeEvents(); len(got) != 0 {
+		t.Fatalf("muted PR emitted %v", got)
+	}
+	if !h.states()["PR_1"].Muted {
+		t.Fatal("a cycle unmuted the PR")
+	}
+
+	// Unmuting resumes with new activity only; what happened while muted stays silent.
+	if err := h.store.SetMuted(ctx, "PR_1", false); err != nil {
+		t.Fatal(err)
+	}
+	h.cycle()
+	if got := h.takeEvents(); len(got) != 0 {
+		t.Fatalf("muted-time activity resurfaced: %v", got)
+	}
+	comment(2)
+	h.cycle()
+	if got := h.takeEvents(); !eq(got, model.MyPRComment) {
+		t.Fatalf("after unmute: %v", got)
+	}
+}
+
+func TestMutedPRClosesSilently(t *testing.T) {
+	h := newHarness(t)
+	h.gh.prs["PR_1"], h.gh.inSet["PR_1"] = myPR("PR_1", "acme/api", 1), true
+	h.cycle()
+	if err := h.store.SetMuted(context.Background(), "PR_1", true); err != nil {
+		t.Fatal(err)
+	}
+	h.gh.edit("PR_1", func(p *model.PRSnapshot) { p.State = model.PRMerged })
+	delete(h.gh.inSet, "PR_1")
+	h.cycle()
+	if got := h.takeEvents(); len(got) != 0 {
+		t.Fatalf("muted PR emitted %v on merge", got)
+	}
+	if _, ok := h.states()["PR_1"]; ok {
+		t.Error("merged PR not purged")
+	}
+}

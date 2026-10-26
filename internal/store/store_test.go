@@ -2,6 +2,7 @@ package store
 
 import (
 	"context"
+	"database/sql"
 	"path/filepath"
 	"testing"
 	"time"
@@ -40,7 +41,7 @@ func TestOpenMigratesAndReopens(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if v, _ := s.Meta(ctx, "schema_version"); v != "1" {
+	if v, _ := s.Meta(ctx, "schema_version"); v != "2" {
 		t.Errorf("schema_version = %q", v)
 	}
 	if err := s.SetMeta(ctx, MetaMeLogin, "mona"); err != nil {
@@ -66,6 +67,39 @@ func TestOpenMigratesAndReopens(t *testing.T) {
 	_ = s.Close()
 	if _, err := Open(ctx, path); err == nil {
 		t.Error("want error for a newer schema")
+	}
+}
+
+// A v1 database (PRism 1.0.0) keeps its PR state and gains the muted column.
+func TestMigrateV1ToV2(t *testing.T) {
+	ctx := context.Background()
+	path := filepath.Join(t.TempDir(), "prism.db")
+	db, err := sql.Open("sqlite", path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, q := range []string{
+		migrations[0],
+		`INSERT INTO meta(key, value) VALUES('schema_version', '1')`,
+		`INSERT INTO pr_state VALUES('PR_1', 'acme/api', 7, 'mine', '{"id":"PR_1"}', '2026-10-24T12:00:00Z')`,
+	} {
+		if _, err := db.ExecContext(ctx, q); err != nil {
+			t.Fatal(err)
+		}
+	}
+	_ = db.Close()
+
+	s, err := Open(ctx, path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer func() { _ = s.Close() }()
+	states, err := s.PRStates(ctx)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if st, ok := states["PR_1"]; !ok || st.Muted || st.Role != RoleMine {
+		t.Errorf("migrated state = %+v", st)
 	}
 }
 
@@ -216,6 +250,40 @@ func TestPRStateRoundTrip(t *testing.T) {
 	}
 }
 
+func TestSetMuted(t *testing.T) {
+	ctx := context.Background()
+	s := open(t)
+	if err := s.SetMuted(ctx, "PR_x", true); err != ErrPRNotFound {
+		t.Errorf("unknown PR: err = %v", err)
+	}
+	snap := &model.PRSnapshot{ID: "PR_1", Repo: "acme/api", Number: 7, State: model.PROpen}
+	st := PRState{PRID: "PR_1", Repo: "acme/api", Number: 7, Role: RoleOther, Snapshot: snap}
+	if err := s.PutPRState(ctx, st); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := s.Record(ctx, []model.Event{ev(model.MyPRComment, "comment:1", "PR_1")}, listAll); err != nil {
+		t.Fatal(err)
+	}
+	if err := s.SetMuted(ctx, "PR_1", true); err != nil {
+		t.Fatal(err)
+	}
+	if n, _ := s.UnreadCount(ctx); n != 0 {
+		t.Errorf("muting left %d unread", n)
+	}
+	if err := s.PutPRState(ctx, st); err != nil { // a poll must not unmute
+		t.Fatal(err)
+	}
+	if states, _ := s.PRStates(ctx); !states["PR_1"].Muted {
+		t.Error("mute lost by PutPRState")
+	}
+	if err := s.SetMuted(ctx, "PR_1", false); err != nil {
+		t.Fatal(err)
+	}
+	if states, _ := s.PRStates(ctx); states["PR_1"].Muted {
+		t.Error("still muted")
+	}
+}
+
 func TestReset(t *testing.T) {
 	ctx := context.Background()
 	s := open(t)
@@ -245,7 +313,7 @@ func TestReset(t *testing.T) {
 	if v, _ := s.Meta(ctx, MetaBaselineDone); v != "" {
 		t.Error("meta survived reset")
 	}
-	if v, _ := s.Meta(ctx, "schema_version"); v != "1" {
+	if v, _ := s.Meta(ctx, "schema_version"); v != "2" {
 		t.Error("schema_version must survive reset")
 	}
 	if fresh, _ := s.Record(ctx, []model.Event{ev(model.MyPRApproved, "review:1", "PR_1")}, listAll); len(fresh) != 1 {

@@ -1,4 +1,4 @@
-import type { Notification } from './api'
+import type { Notification, PRStatus } from './api'
 
 // Event → leading visual (prism-ui skill §Event visuals, assets/README.md).
 export type Tint = 'green' | 'red' | 'orange' | 'grey' | 'purple' | 'blue'
@@ -70,7 +70,16 @@ export function inTab(n: Notification, tab: TabId): boolean {
   }
 }
 
-export type PRGroup = { prId: string; repo: string; number: number; title: string; url: string; mine: boolean; items: Notification[] }
+export type PRGroup = {
+  prId: string
+  repo: string
+  number: number
+  title: string
+  url: string
+  mine: boolean
+  status?: PRStatus | null // absent once the PR left the watch set (closed)
+  items: Notification[]
+}
 
 /** Groups notifications by PR, keeping the order of each PR's newest item. */
 export function groupByPR(list: Notification[]): PRGroup[] {
@@ -78,12 +87,29 @@ export function groupByPR(list: Notification[]): PRGroup[] {
   for (const n of list) {
     let g = groups.get(n.prId)
     if (!g) {
-      g = { prId: n.prId, repo: n.repo, number: n.prNumber, title: n.prTitle, url: n.prUrl, mine: n.mine, items: [] }
+      g = { prId: n.prId, repo: n.repo, number: n.prNumber, title: n.prTitle, url: n.prUrl, mine: n.mine, status: n.prStatus, items: [] }
       groups.set(n.prId, g)
     }
     g.items.push(n)
   }
   return [...groups.values()]
+}
+
+export type Chip = { label: string; icon?: string; tint?: Tint }
+
+/** The group header's status line: draft, reviews, CI and conflicts at the last poll. */
+export function statusChips(s: PRStatus | null | undefined): Chip[] {
+  if (!s) return []
+  const chips: Chip[] = []
+  if (s.draft) chips.push({ label: 'Draft', icon: 'pull-request' })
+  if (s.approvals > 0)
+    chips.push({ label: s.approvals === 1 ? '1 approval' : `${s.approvals} approvals`, icon: 'check-circle', tint: 'green' })
+  if (s.changesRequested > 0) chips.push({ label: 'Changes requested', icon: 'changes-requested', tint: 'red' })
+  if (s.ci === 'failing') chips.push({ label: 'CI failing', icon: 'x-circle', tint: 'red' })
+  else if (s.ci === 'pending') chips.push({ label: 'CI running', icon: 'refresh' })
+  else if (s.ci === 'passing') chips.push({ label: 'CI passing', icon: 'check-circle', tint: 'green' })
+  if (s.conflict) chips.push({ label: 'Conflict', icon: 'conflict', tint: 'orange' })
+  return chips
 }
 
 // Settings → Events table (SPEC §3): grouped by where the event happens,

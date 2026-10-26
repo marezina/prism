@@ -49,20 +49,21 @@ type SkippedOrg struct {
 
 // Notification is one unread item for the popup.
 type Notification struct {
-	ID          int64  `json:"id"`
-	Type        string `json:"type"`
-	PRID        string `json:"prId"`
-	Repo        string `json:"repo"`
-	PRNumber    int    `json:"prNumber"`
-	PRTitle     string `json:"prTitle"`
-	PRURL       string `json:"prUrl"`
-	Mine        bool   `json:"mine"` // the PR is authored by me
-	ActorLogin  string `json:"actorLogin,omitempty"`
-	ActorAvatar string `json:"actorAvatar,omitempty"`
-	Summary     string `json:"summary"`
-	Excerpt     string `json:"excerpt,omitempty"`
-	URL         string `json:"url"`
-	OccurredAt  string `json:"occurredAt"` // RFC3339
+	ID          int64     `json:"id"`
+	Type        string    `json:"type"`
+	PRID        string    `json:"prId"`
+	Repo        string    `json:"repo"`
+	PRNumber    int       `json:"prNumber"`
+	PRTitle     string    `json:"prTitle"`
+	PRURL       string    `json:"prUrl"`
+	Mine        bool      `json:"mine"` // the PR is authored by me
+	ActorLogin  string    `json:"actorLogin,omitempty"`
+	ActorAvatar string    `json:"actorAvatar,omitempty"`
+	Summary     string    `json:"summary"`
+	Excerpt     string    `json:"excerpt,omitempty"`
+	URL         string    `json:"url"`
+	OccurredAt  string    `json:"occurredAt"`         // RFC3339
+	PRStatus    *PRStatus `json:"prStatus,omitempty"` // nil once the PR left the watch set
 }
 
 // Org is a row of the organization picker.
@@ -75,12 +76,12 @@ type Org struct {
 	SSOURL      string `json:"ssoUrl,omitempty"`
 }
 
-func (c *Core) toDTO(n store.Notification, mine map[string]bool) Notification {
+func (c *Core) toDTO(n store.Notification, pr store.PRState) Notification {
 	return Notification{
 		ID: n.ID, Type: string(n.Type), PRID: n.PRID, Repo: n.Repo, PRNumber: n.PRNumber, PRTitle: n.PRTitle,
-		PRURL: c.prURL(n.Repo, n.PRNumber), Mine: mine[n.PRID] || isMyPRType(string(n.Type)),
+		PRURL: c.prURL(n.Repo, n.PRNumber), Mine: pr.Role == store.RoleMine || isMyPRType(string(n.Type)),
 		ActorLogin: n.Actor.Login, ActorAvatar: n.Actor.AvatarURL, Summary: n.Summary, Excerpt: n.Excerpt,
-		URL: n.URL, OccurredAt: n.OccurredAt.UTC().Format(time.RFC3339),
+		URL: n.URL, OccurredAt: n.OccurredAt.UTC().Format(time.RFC3339), PRStatus: prStatus(pr.Snapshot),
 	}
 }
 

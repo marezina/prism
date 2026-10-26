@@ -3,6 +3,7 @@ package store
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"time"
 
@@ -15,6 +16,9 @@ const (
 	RoleOther = "other"
 )
 
+// ErrPRNotFound is returned for a PR that is not watched.
+var ErrPRNotFound = errors.New("store: PR is not watched")
+
 // PRState is a row of pr_state: the previous snapshot of a watched PR.
 type PRState struct {
 	PRID      string
@@ -23,6 +27,7 @@ type PRState struct {
 	Role      string
 	Snapshot  *model.PRSnapshot
 	UpdatedAt time.Time
+	Muted     bool // set by SetMuted only; PutPRState keeps it
 }
 
 func jsonMarshal(v any) (string, error) {
@@ -35,7 +40,7 @@ func jsonMarshal(v any) (string, error) {
 
 // PRStates returns every watched PR by node id.
 func (s *Store) PRStates(ctx context.Context) (map[string]PRState, error) {
-	rows, err := s.db.QueryContext(ctx, `SELECT pr_id, repo, number, role, snapshot, updated_at FROM pr_state`)
+	rows, err := s.db.QueryContext(ctx, `SELECT pr_id, repo, number, role, snapshot, updated_at, muted FROM pr_state`)
 	if err != nil {
 		return nil, fmt.Errorf("read pr_state: %w", err)
 	}
@@ -46,7 +51,7 @@ func (s *Store) PRStates(ctx context.Context) (map[string]PRState, error) {
 			st       PRState
 			snap, up string
 		)
-		if err := rows.Scan(&st.PRID, &st.Repo, &st.Number, &st.Role, &snap, &up); err != nil {
+		if err := rows.Scan(&st.PRID, &st.Repo, &st.Number, &st.Role, &snap, &up, &st.Muted); err != nil {
 			return nil, fmt.Errorf("scan pr_state: %w", err)
 		}
 		st.UpdatedAt = parseTS(up)
@@ -73,6 +78,29 @@ func (s *Store) PutPRState(ctx context.Context, st PRState) error {
 		return fmt.Errorf("write pr_state %s: %w", st.PRID, err)
 	}
 	return nil
+}
+
+// SetMuted mutes or unmutes a watched PR. Muting also marks its
+// notifications read; the mute ends when the PR is purged.
+func (s *Store) SetMuted(ctx context.Context, prID string, muted bool) error {
+	tx, err := s.db.BeginTx(ctx, nil)
+	if err != nil {
+		return fmt.Errorf("mute %s: %w", prID, err)
+	}
+	defer func() { _ = tx.Rollback() }()
+	res, err := tx.ExecContext(ctx, `UPDATE pr_state SET muted = ? WHERE pr_id = ?`, muted, prID)
+	if err != nil {
+		return fmt.Errorf("mute %s: %w", prID, err)
+	}
+	if n, _ := res.RowsAffected(); n == 0 {
+		return ErrPRNotFound
+	}
+	if muted {
+		if _, err := tx.ExecContext(ctx, `DELETE FROM notifications WHERE pr_id = ?`, prID); err != nil {
+			return fmt.Errorf("mute %s: %w", prID, err)
+		}
+	}
+	return tx.Commit()
 }
 
 // PurgePR deletes a PR's state, notifications and tombstones (SPEC §5: the PR

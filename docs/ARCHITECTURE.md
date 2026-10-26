@@ -98,7 +98,7 @@ HEAD_REF_FORCE_PUSHED_EVENT). "My latest review oid" is derived from reviews in 
 Connections are paginated to completion (≤ 20 extra pages each), so snapshots are full.
 The previous snapshot is stored as JSON in `pr_state.snapshot`.
 
-## 5. Database schema (v1)
+## 5. Database schema (v2)
 
 ```sql
 CREATE TABLE meta (key TEXT PRIMARY KEY, value TEXT NOT NULL);
@@ -112,7 +112,8 @@ CREATE TABLE pr_state (
   number       INTEGER NOT NULL,
   role         TEXT NOT NULL,          -- mine | other
   snapshot     TEXT NOT NULL,          -- JSON PRSnapshot (previous)
-  updated_at   TEXT NOT NULL
+  updated_at   TEXT NOT NULL,
+  muted        INTEGER NOT NULL DEFAULT 0 -- v2; polls keep it, purge ends it
 );
 
 CREATE TABLE notifications (

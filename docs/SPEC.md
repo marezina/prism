@@ -99,6 +99,10 @@ Clarifications (change here first if the behaviour should change):
 - PR leaves the open set → fetched once to learn merged/closed → rows, tombstones and
   pr_state purged; `my_pr.closed` emitted if it was my PR.
 - Owner unselected in settings → its PRs purged the same way, no `closed` events.
+- Mute PR (bell button on a PR group) → its rows are marked read and its events are
+  dropped (no list, toast or sound, including `closed`) while snapshots keep updating.
+  Unmute (Settings → Muted PRs) resumes with activity after that point; the mute ends
+  when the PR is purged.
 
 ## 6. Delivery rules
 - Burst grouping: ≥ 3 events within a 10 s window → one summary toast
@@ -125,7 +129,7 @@ Clarifications (change here first if the behaviour should change):
   "theme": "system"                    // system | light | dark
 }
 ```
-Settings sections: Account, Organizations, Events, Sound, Behavior, Appearance,
+Settings sections: Account, Organizations, Events, Muted PRs, Sound, Behavior, Appearance,
 Advanced (open logs folder, reset local data).
 
 ## 8. Login flow

@@ -35,7 +35,10 @@ gradients, no emoji. Content first.
 ## Components (see the canvas mockups)
 - **PR group**: repo (12, muted) + label pill (`Your PR` grey / `Review` blue),
   title line `#482 Title` (number muted 500, title 600, ellipsis), "Mark PR read"
-  outline button right. Divider below group.
+  outline button right, bell-off icon button (Mute PR) before it while the PR is
+  watched. Under the title an optional status line (12 px, gap 4/12): Draft, N approvals
+  (green), Changes requested (red), CI passing (green) / failing (red) / running,
+  Conflict (orange); 12 px icon + text, tint as text color only. Divider below group.
 - **Notification row**: 28 px avatar circle (or 28 px rounded-6 icon tile for system
   events with tinted bg per type), text `**Actor** action`, optional excerpt box
   (`--surface-2`, radius 6, 13 px), right side relative time + 7 px unread dot
@@ -63,6 +66,9 @@ gradients, no emoji. Content first.
 
 ## Behaviour
 - Popup window ~440×640, opens anchored to tray, closes on blur/Esc.
+- Motion: Svelte `slide`/`fade`/`fly` with `motion(ms)` from `src/lib/motion.ts`
+  (120–180 ms, cubicOut, 0 under reduced motion). Rows and groups animate when they
+  arrive or leave within a tab; the list is `{#key tab}` so tab switches are instant.
 - Optimistic UI for mark-read; on error, restore and show inline error.
 - Relative times: `now`, `5m`, `2h`, `3d`; refresh every 30 s.
 - Empty state: small prism glyph + "You're all caught up".
