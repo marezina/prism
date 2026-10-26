@@ -6,7 +6,7 @@
   import Avatar from '../lib/Avatar.svelte'
   import Icon from '../lib/Icon.svelte'
   import Toggle from '../lib/Toggle.svelte'
-  import { eventSettings } from '../lib/events'
+  import { eventGroups } from '../lib/events'
   import { setTheme } from '../lib/theme'
   import OrgPicker from './OrgPicker.svelte'
 
@@ -115,20 +115,23 @@
             <span role="columnheader">Toast</span>
             <span role="columnheader">Sound</span>
           </div>
-          {#each eventSettings as e (e.type)}
-            {@const f = events()[e.type] ?? { list: false, toast: false, sound: false }}
-            <div class="ev-row" role="row">
-              <span class="ev-name" role="cell">
-                <span>{e.label}</span>
-                <span class="meta">{e.hint}</span>
-              </span>
-              <span role="cell"><Toggle label="{e.label}: show in list" checked={f.list}
-                onchange={(v) => { events()[e.type] = { ...f, list: v }; save() }} /></span>
-              <span role="cell"><Toggle label="{e.label}: toast" checked={f.toast}
-                onchange={(v) => { events()[e.type] = { ...f, toast: v }; save() }} /></span>
-              <span role="cell"><Toggle label="{e.label}: sound" checked={f.sound}
-                onchange={(v) => { events()[e.type] = { ...f, sound: v }; save() }} /></span>
-            </div>
+          {#each eventGroups as g (g.title)}
+            <div class="ev-row ev-group" role="row"><span role="rowheader">{g.title}</span></div>
+            {#each g.events as e (e.type)}
+              {@const f = events()[e.type] ?? { list: false, toast: false, sound: false }}
+              <div class="ev-row" role="row">
+                <span class="ev-name" role="cell">
+                  <span>{e.label}</span>
+                  <span class="meta">{e.hint}</span>
+                </span>
+                <span role="cell"><Toggle label="{e.label}: show in list" checked={f.list}
+                  onchange={(v) => { events()[e.type] = { ...f, list: v }; save() }} /></span>
+                <span role="cell"><Toggle label="{e.label}: toast" checked={f.toast}
+                  onchange={(v) => { events()[e.type] = { ...f, toast: v }; save() }} /></span>
+                <span role="cell"><Toggle label="{e.label}: sound" checked={f.sound}
+                  onchange={(v) => { events()[e.type] = { ...f, sound: v }; save() }} /></span>
+              </div>
+            {/each}
           {/each}
         </div>
       </section>
@@ -322,6 +325,14 @@
     line-height: 16px;
     color: var(--text-3);
     font-weight: 500;
+  }
+  .ev-group {
+    display: block;
+    padding-top: var(--space-4);
+    font-size: 12px;
+    line-height: 16px;
+    font-weight: 600;
+    color: var(--text-2);
   }
   .ev-name {
     display: flex;

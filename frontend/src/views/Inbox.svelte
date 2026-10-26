@@ -4,7 +4,7 @@
   import { Api, Events, errorText, type Notification, type SyncStatus } from '../lib/api'
   import Avatar from '../lib/Avatar.svelte'
   import Icon from '../lib/Icon.svelte'
-  import { groupByPR, inTab, showsExcerpt, tabs, visual, type TabId } from '../lib/events'
+  import { groupByPR, inTab, opensLink, showsExcerpt, tabs, visual, type TabId } from '../lib/events'
   import { relative, tick } from '../lib/time'
 
   let { onsettings }: { onsettings: () => void } = $props()
@@ -12,7 +12,7 @@
   let items: Notification[] = $state([])
   let loaded = $state(false)
   let tab: TabId = $state('all')
-  let status: SyncStatus = $state({ offline: false, watched: 0, rateRemaining: 0, skipped: [] })
+  let status: SyncStatus = $state({ offline: false, syncing: false, watched: 0, rateRemaining: 0, skipped: [] })
   let error = $state('')
   let now = $state(Date.now())
   let listEl: HTMLElement | undefined = $state()
@@ -56,6 +56,7 @@
 
   const open = (n: Notification) => remove([n.id], () => Api.Open(n.id))
   const markRead = (n: Notification) => remove([n.id], () => Api.MarkRead([n.id]))
+  const activate = (n: Notification) => (opensLink(n.type) ? open(n) : markRead(n))
   const markPR = (prId: string) =>
     remove(items.filter((n) => n.prId === prId).map((n) => n.id), () => Api.MarkPRRead(prId))
   const markAll = () => remove(items.map((n) => n.id), () => Api.MarkAllRead())
@@ -159,7 +160,8 @@
 
         {#each g.items as n (n.id)}
           {@const v = visual(n.type)}
-          <button class="row" data-row={n.id} onclick={() => open(n)}>
+          {@const link = opensLink(n.type)}
+          <button class="row" data-row={n.id} title={link ? 'Open comment' : 'Mark as read'} onclick={() => activate(n)}>
             {#if v.kind === 'icon'}
               <span class="tile tint-{v.tint}"><Icon name={v.icon} /></span>
             {:else if n.actorAvatar || n.actorLogin}
@@ -169,7 +171,7 @@
             {/if}
             <span class="body">
               <span class="text">
-                {#if n.actorLogin && v.kind === 'avatar'}<strong>{n.actorLogin}</strong> {/if}{actionText(n)}
+                {#if n.actorLogin && v.kind === 'avatar'}<strong>{n.actorLogin}</strong>{' '}{/if}{actionText(n)}
               </span>
               {#if n.excerpt && showsExcerpt(n.type)}<span class="excerpt">{n.excerpt}</span>{/if}
             </span>
@@ -185,10 +187,12 @@
 
   <footer class="foot">
     <span class="muted">
-      {#if status.lastSync}Synced {relative(status.lastSync, now) === 'now' ? 'just now' : relative(status.lastSync, now) + ' ago'}
+      {#if status.syncing}Syncing…{:else if status.lastSync}Synced {relative(status.lastSync, now) === 'now' ? 'just now' : relative(status.lastSync, now) + ' ago'}
         · {status.watched} PRs watched{:else}Syncing…{/if}
     </span>
-    <button class="icon-btn" aria-label="Refresh now" title="Refresh now" onclick={() => Api.RefreshNow()}>
+    <button class="icon-btn" class:spinning={status.syncing} aria-label={status.syncing ? 'Syncing' : 'Refresh now'}
+            title={status.syncing ? 'Syncing…' : 'Refresh now'} aria-busy={status.syncing} disabled={status.syncing}
+            onclick={() => { status = { ...status, syncing: true }; Api.RefreshNow() }}>
       <Icon name="refresh" size={14} />
     </button>
   </footer>
@@ -220,6 +224,22 @@
   .icon-btn:disabled {
     opacity: 0.4;
     cursor: default;
+  }
+  .icon-btn.spinning:disabled {
+    opacity: 1;
+  }
+  .spinning :global(svg) {
+    animation: spin 0.9s linear infinite;
+  }
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .spinning :global(svg) {
+      animation-duration: 3s;
+    }
   }
   .banner {
     display: flex;

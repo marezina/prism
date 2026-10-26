@@ -27,7 +27,7 @@ type SearchResult struct {
 }
 
 // searchQuery mirrors a richer form of query 1 (WatchSet) in the github-api
-// skill's references/queries.graphql; Phase 2 trims it back to id + isDraft.
+// skill's references/queries.graphql.
 type searchQuery struct {
 	RateLimit struct {
 		Cost      int

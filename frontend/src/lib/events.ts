@@ -35,6 +35,14 @@ export function showsExcerpt(type: string): boolean {
   return !systemVisuals[type] && type !== 'review.requested'
 }
 
+// Comment-like events: clicking the row opens the comment on GitHub. Every other
+// row only marks itself read; the PR title above the group opens the PR.
+const linkTypes = new Set(['my_pr.comment', 'my_pr.thread_reply', 'comment.reply_to_me', 'mention'])
+
+export function opensLink(type: string): boolean {
+  return linkTypes.has(type)
+}
+
 export const tabs = [
   { id: 'all', label: 'All' },
   { id: 'mine', label: 'My PRs' },
@@ -78,19 +86,37 @@ export function groupByPR(list: Notification[]): PRGroup[] {
   return [...groups.values()]
 }
 
-// Settings → Events table (SPEC §3).
-export const eventSettings: { type: string; label: string; hint: string }[] = [
-  { type: 'my_pr.approved', label: 'Approved', hint: 'Someone approves your PR' },
-  { type: 'my_pr.changes_requested', label: 'Changes requested', hint: 'Someone requests changes on your PR' },
-  { type: 'my_pr.comment', label: 'Comments', hint: 'New comments and reviews on your PR' },
-  { type: 'my_pr.thread_reply', label: 'Thread replies', hint: 'Replies in review threads on your PR' },
-  { type: 'comment.reply_to_me', label: 'Replies to you', hint: 'Someone replies to your comment, anywhere' },
-  { type: 'review.requested', label: 'Review requests', hint: 'You or your team are asked to review' },
-  { type: 'mention', label: 'Mentions', hint: 'You or your team are @mentioned' },
-  { type: 'ci.failed', label: 'CI failed', hint: 'Checks fail on your PR' },
-  { type: 'ci.passed', label: 'CI passed', hint: 'Checks turn green on your PR' },
-  { type: 'merge.conflict', label: 'Merge conflicts', hint: 'Your PR can no longer be merged cleanly' },
-  { type: 'commits.after_my_review', label: 'Commits after your review', hint: 'A PR you reviewed gets new commits' },
-  { type: 'my_pr.closed', label: 'PR merged or closed', hint: 'Your PR is merged or closed' },
-  { type: 'my_pr.opened', label: 'PR opened', hint: 'A PR you opened starts being watched' },
+// Settings → Events table (SPEC §3): grouped by where the event happens,
+// alphabetical within a group.
+export type EventSetting = { type: string; label: string; hint: string }
+
+export const eventGroups: { title: string; events: EventSetting[] }[] = [
+  {
+    title: 'Your PRs',
+    events: [
+      { type: 'my_pr.approved', label: 'Approved', hint: 'Someone approves your PR' },
+      { type: 'my_pr.changes_requested', label: 'Changes requested', hint: 'Someone requests changes on your PR' },
+      { type: 'my_pr.comment', label: 'Comments', hint: 'New comments and reviews on your PR' },
+      { type: 'my_pr.closed', label: 'Merged or closed', hint: 'Your PR is merged or closed' },
+      { type: 'my_pr.opened', label: 'Opened', hint: 'A PR you opened starts being watched' },
+      { type: 'my_pr.thread_reply', label: 'Thread replies', hint: 'Replies in review threads on your PR' },
+    ],
+  },
+  {
+    title: 'Checks and merging',
+    events: [
+      { type: 'ci.failed', label: 'CI failed', hint: 'Checks fail on your PR' },
+      { type: 'ci.passed', label: 'CI passed', hint: 'Checks turn green on your PR' },
+      { type: 'merge.conflict', label: 'Merge conflicts', hint: 'Your PR can no longer be merged cleanly' },
+    ],
+  },
+  {
+    title: 'Other PRs',
+    events: [
+      { type: 'commits.after_my_review', label: 'Commits after your review', hint: 'A PR you reviewed gets new commits' },
+      { type: 'mention', label: 'Mentions', hint: 'You or your team are @mentioned' },
+      { type: 'comment.reply_to_me', label: 'Replies to you', hint: 'Someone replies to your comment, anywhere' },
+      { type: 'review.requested', label: 'Review requests', hint: 'You or your team are asked to review' },
+    ],
+  },
 ]

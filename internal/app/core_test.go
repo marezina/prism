@@ -136,7 +136,7 @@ func (r *recordingNotifier) Show(_ context.Context, t notify.Toast) error {
 
 func newRig(t *testing.T, f *fakeGitHub, st *store.Store) *rig {
 	t.Helper()
-	h := &hooks{syncs: make(chan SyncStatus, 16)}
+	h := &hooks{syncs: make(chan SyncStatus, 64)}
 	ep := f.endpoints()
 	log := slog.New(slog.DiscardHandler)
 	session := &auth.Session{
@@ -171,14 +171,21 @@ func openStore(t *testing.T) *store.Store {
 	return st
 }
 
+// waitSync returns the status of the next finished cycle, skipping the
+// "syncing" status sent when a cycle starts.
 func waitSync(t *testing.T, h *hooks) SyncStatus {
 	t.Helper()
-	select {
-	case s := <-h.syncs:
-		return s
-	case <-time.After(5 * time.Second):
-		t.Fatal("no sync status")
-		return SyncStatus{}
+	deadline := time.After(5 * time.Second)
+	for {
+		select {
+		case s := <-h.syncs:
+			if !s.Syncing {
+				return s
+			}
+		case <-deadline:
+			t.Fatal("no sync status")
+			return SyncStatus{}
+		}
 	}
 }
 

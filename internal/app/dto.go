@@ -32,6 +32,7 @@ type AuthState struct {
 type SyncStatus struct {
 	LastSync      string       `json:"lastSync,omitempty"` // RFC3339 of the last successful poll
 	Offline       bool         `json:"offline"`
+	Syncing       bool         `json:"syncing"` // a full poll is running
 	Error         string       `json:"error,omitempty"`
 	SSOURL        string       `json:"ssoUrl,omitempty"`
 	Watched       int          `json:"watched"`

@@ -157,6 +157,7 @@ func (c *Core) startPolling(client *gh.Client, id gh.Identity) {
 		Log:      c.log,
 		OnEvents: c.onEvents,
 		OnStatus: c.onStatus,
+		OnSync:   c.onSync,
 	})
 	done := make(chan struct{})
 	c.mu.Lock()
@@ -208,6 +209,17 @@ func (c *Core) onStatus(s poller.Status) {
 	}
 	c.mu.Lock()
 	c.sync = st
+	c.mu.Unlock()
+	if h := c.opts.Hooks.SyncStatus; h != nil {
+		h(st)
+	}
+}
+
+// onSync marks the status as syncing until the cycle's onStatus arrives.
+func (c *Core) onSync() {
+	c.mu.Lock()
+	c.sync.Syncing = true
+	st := c.sync
 	c.mu.Unlock()
 	if h := c.opts.Hooks.SyncStatus; h != nil {
 		h(st)

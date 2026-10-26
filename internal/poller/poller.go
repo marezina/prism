@@ -59,7 +59,8 @@ type Options struct {
 	Log      *slog.Logger
 	OnEvents func([]store.Fresh) // new events, already stored; called from the poll goroutine
 	OnStatus func(Status)
-	Clock    Clock // nil: real clock
+	OnSync   func() // a slow-tier cycle starts; OnStatus follows when it ends
+	Clock    Clock  // nil: real clock
 }
 
 // Poller polls GitHub and records events.
@@ -70,6 +71,7 @@ type Poller struct {
 	log      *slog.Logger
 	onEvents func([]store.Fresh)
 	onStatus func(Status)
+	onSync   func()
 	clock    Clock
 
 	mu      sync.Mutex // serializes cycles
@@ -95,9 +97,12 @@ func New(o Options) *Poller {
 	if o.OnStatus == nil {
 		o.OnStatus = func(Status) {}
 	}
+	if o.OnSync == nil {
+		o.OnSync = func() {}
+	}
 	return &Poller{
 		gh: o.GitHub, store: o.Store, me: o.Me, log: o.Log,
-		onEvents: o.OnEvents, onStatus: o.OnStatus, clock: o.Clock,
+		onEvents: o.OnEvents, onStatus: o.OnStatus, onSync: o.OnSync, clock: o.Clock,
 		trigger: make(chan struct{}, 1),
 		recheck: map[string]bool{},
 	}
@@ -119,6 +124,7 @@ func (p *Poller) Cycle(ctx context.Context) error {
 	p.mu.Lock()
 	defer p.mu.Unlock()
 
+	p.onSync()
 	err := p.cycle(ctx)
 	p.status.Err = err
 	if err == nil {
@@ -453,7 +459,7 @@ func ownerOf(repo string) string {
 	return strings.ToLower(owner)
 }
 
-// logUsage logs GraphQL points spent per hour (PLAN Phase 4 DoD: < 10 % of 5 000).
+// logUsage logs GraphQL points spent per hour (budget: < 10 % of 5 000).
 func (p *Poller) logUsage(cost int) {
 	now := p.clock.Now()
 	if p.usageStart.IsZero() {
