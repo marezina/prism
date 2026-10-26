@@ -138,8 +138,9 @@
 
   {#if error}<p class="notice notice-error err" role="alert">{error}</p>{/if}
 
-  <!-- Keyed by tab: switching tabs swaps the list instantly; rows and groups
-       animate only when they arrive or are read within a tab. -->
+  <!-- Keyed by tab, and groups render only once loaded: the first list and tab
+       switches appear instantly; rows and groups animate only when they arrive or
+       are read later. -->
   {#key tab}
   <div class="list" bind:this={listEl}>
     {#if loaded && groups.length === 0}
@@ -150,6 +151,7 @@
       </div>
     {/if}
 
+    {#if loaded}
     {#each groups as g (g.prId)}
       {@const chips = statusChips(g.status)}
       <section class="group" aria-label="{g.repo} #{g.number}" transition:slide={motion(180)}>
@@ -205,6 +207,7 @@
         {/each}
       </section>
     {/each}
+    {/if}
   </div>
   {/key}
 
