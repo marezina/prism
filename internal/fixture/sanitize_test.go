@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"testing"
 	"time"
@@ -135,8 +136,11 @@ func TestMappingFilesAndCheck(t *testing.T) {
 	if err := SaveMapping(dir, "approved__basic", m); err != nil {
 		t.Fatal(err)
 	}
-	if info, err := os.Stat(mapPath(dir, "approved__basic")); err != nil || info.Mode().Perm() != 0o600 {
-		t.Fatalf("mapping file perms: %v %v", info, err)
+	// Windows has no Unix permission bits; Go always reports 0666 there.
+	if info, err := os.Stat(mapPath(dir, "approved__basic")); err != nil {
+		t.Fatal(err)
+	} else if runtime.GOOS != "windows" && info.Mode().Perm() != 0o600 {
+		t.Fatalf("mapping file perms = %v, want 0600", info.Mode().Perm())
 	}
 
 	m2, err := LoadMapping(dir, "approved__basic", "MONA")
