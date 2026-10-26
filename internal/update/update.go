@@ -1,4 +1,4 @@
-// Package update checks the internal release repo for a newer PRism
+// Package update checks the release repo for a newer PRism
 // (release skill §Update check). It only reads; installing is manual for now.
 package update
 
@@ -41,7 +41,7 @@ func canonical(v string) string {
 }
 
 // Latest returns the newest release, including pre-releases, using the
-// user's token (the internal repo is private).
+// user's token (also works if the release repo is private).
 func Latest(ctx context.Context, c *gh.Client, repo string) (Release, error) {
 	owner, name, ok := strings.Cut(repo, "/")
 	if !ok {

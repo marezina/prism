@@ -29,4 +29,4 @@ as the release notes.
 - Settings for every event (list / toast / sound; grouped by Your PRs, Checks and
   merging, Other PRs), sounds, poll interval, bots, drafts, quiet hours, start at login,
   theme; "Reset local data".
-- Update check against the internal release repo.
+- Update check against this repository's releases.

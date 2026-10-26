@@ -17,7 +17,7 @@ body:
     id: what
     attributes:
       label: What happened, and what did you expect?
-      description: For notification problems, link the PR and the comment or review (only colleagues can open it).
+      description: This repository is public — don't paste code, comment text or links from private repositories. Describe the event type and timing instead.
     validations: { required: true }
   - type: input
     id: version

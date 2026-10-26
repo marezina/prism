@@ -1,7 +1,7 @@
 # GitHub OAuth App setup (one-time, org admin)
 
 1. GitHub → Organization settings → Developer settings → OAuth Apps → **New OAuth App**.
-2. Name: `PRism`. Homepage URL: internal repo URL. Callback URL: the same URL
+2. Name: `PRism`. Homepage URL: the repository URL. Callback URL: the same URL
    (unused by device flow but required).
 3. Tick **Enable Device Flow**. Register.
 4. Put the **Client ID** into the release repository as an Actions *variable*

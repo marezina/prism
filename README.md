@@ -44,7 +44,8 @@ Data lives in `%APPDATA%\PRism` / `~/.config/PRism` (database, avatars, logs).
 
 ## Feedback
 Open an issue with the **Feedback** template. Include the version
-(Settings → Advanced) and, for notification problems, a link to the PR.
+(Settings → Advanced). The repository is public: don't paste code, comments or links
+from private repositories. Security problems: see [SECURITY.md](SECURITY.md).
 
 ## Development
 See `CLAUDE.md` (commands), `docs/SPEC.md`, `docs/ARCHITECTURE.md` and the ADRs
@@ -57,4 +58,7 @@ in `docs/adr/`.
   builds, signs (when the certificate secret is set) and publishes. Set the repository
   variable `PRISM_CLIENT_ID` to the org OAuth App's client ID first.
 
-Assets in `assets/` are CC0 (see `assets/README.md`).
+## License
+PRism is released under the [Zero-Clause BSD license](LICENSE): use it for anything,
+no attribution required. Assets in `assets/` are CC0 (see `assets/README.md`). The
+bundled fonts Inter and JetBrains Mono are under the SIL Open Font License 1.1.
