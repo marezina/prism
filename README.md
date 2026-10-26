@@ -6,6 +6,11 @@ CI results and merge conflicts — as desktop toasts and a small popup.
 
 PRism only **reads** from GitHub and keeps everything on your computer. No telemetry.
 
+<p align="center">
+  <img src="docs/images/prism-popup.png" width="760"
+       alt="The PRism popup in light and dark theme: unread notifications grouped by pull request, each with its review, CI and conflict status">
+</p>
+
 ## Install
 
 Download the latest release from this repository's **Releases** page and check the
