@@ -47,6 +47,26 @@ Requirements:
 Data lives in `%APPDATA%\PRism` / `~/.config/PRism` (database, avatars, logs).
 **Settings → Advanced → Reset local data** clears it; **Sign out** forgets the token.
 
+## Screenshots
+
+A toast on Linux (KDE Plasma): who did what, on which PR, with the comment and
+buttons to open the PR or mark it read.
+
+<p align="center">
+  <img src="docs/images/prism-toast-linux.png" width="334"
+       alt="A PRism toast: tomislav commented on your PR, with the PR title, the comment and Open PR / Mark as read buttons">
+</p>
+
+Settings: organizations to watch, and per event whether it shows in the list, as a
+toast and with a sound.
+
+<p align="center">
+  <img src="docs/images/prism-settings.png" width="760"
+       alt="PRism settings in light and dark theme: account and organizations, and the per-event list, toast and sound toggles">
+</p>
+
+The screenshots use made-up data.
+
 ## Feedback
 Open an issue with the **Feedback** template. Include the version
 (Settings → Advanced). The repository is public: don't paste code, comments or links
