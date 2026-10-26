@@ -84,8 +84,10 @@ jobs:
         run: |
           v="${PRISM_VERSION#v}"; v="${v%%-*}"
           wails3 generate webview2bootstrapper -dir build/windows/nsis
+          # makensis on Windows only splits paths on "\", so pass a native path.
+          exe="$(cygpath -w "$GITHUB_WORKSPACE/bin/prism.exe")"
           cd build/windows/nsis
-          makensis -DINFO_PRODUCTVERSION="${v}" -DARG_WAILS_AMD64_BINARY="$GITHUB_WORKSPACE/bin/prism.exe" project.nsi
+          makensis -DINFO_PRODUCTVERSION="${v}" -DARG_WAILS_AMD64_BINARY="${exe}" project.nsi
       - name: Sign installer
         if: env.HAS_CERT == 'true'
         env:
