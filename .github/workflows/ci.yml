@@ -12,7 +12,8 @@ jobs:
       fail-fast: false
       matrix:
         # Linux: Wails v3 uses GTK4 + WebKitGTK 6.0, first shipped in Ubuntu 24.04 (ADR 0001).
-        os: [ubuntu-24.04, windows-latest]
+        # windows-11-arm: native ARM64 run, the installer ships an arm64 exe too.
+        os: [ubuntu-24.04, windows-latest, windows-11-arm]
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
@@ -28,7 +29,9 @@ jobs:
         run: mkdir -p frontend/dist && touch frontend/dist/.keep
       - run: go vet ./...
       - name: Test
-        run: go test -race -count=1 ./...
+        # The race detector has no windows/arm64 support.
+        shell: bash
+        run: go test ${{ matrix.os != 'windows-11-arm' && '-race' || '' }} -count=1 ./...
       - name: Fixtures are sanitized
         if: runner.os == 'Linux'
         run: go run ./cmd/prism-cli sanitize-check

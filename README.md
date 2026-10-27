@@ -17,7 +17,8 @@ Download the latest release from this repository's **Releases** page and check t
 file against `SHA256SUMS.txt`.
 
 ### Windows 11
-1. Run `PRism-<version>-windows-amd64-setup.exe`. It installs for your user only
+1. Run `PRism-<version>-windows-setup.exe` (x64 and ARM64 in one installer; it picks
+   the right build for your PC). It installs for your user only
    (no admin rights) into `%LOCALAPPDATA%\Programs\PRism`, adds a Start-menu entry and,
    if you keep the box ticked, starts PRism when you sign in.
 2. If a build is unsigned, SmartScreen shows "Windows protected your PC" →

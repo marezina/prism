@@ -22,7 +22,8 @@ description: Building, versioning, packaging and distributing PRism — CI workf
   GTK4/WebKitGTK 6.0 — see ADR 0001), package, sign, upload to GitHub Release with
   `SHA256SUMS.txt`. Tags with a `-` (`-beta.N`) publish as pre-releases; notes come
   from the matching `CHANGELOG.md` section. Artifacts:
-  `PRism-<v>-windows-amd64-setup.exe`, `PRism-<v>-x86_64.AppImage`, `prism_<v>_amd64.deb`.
+  `PRism-<v>-windows-setup.exe` (one NSIS installer carrying amd64 + arm64 exes; Go
+  cross-compiles arm64 with CGO off on windows-latest, CI also tests on windows-11-arm), `PRism-<v>-x86_64.AppImage`, `prism_<v>_amd64.deb`.
 - Signing secrets (optional): `WINDOWS_CERT_PFX_BASE64`, `WINDOWS_CERT_PASSWORD`; the
   exe is signed before NSIS packs it, then the installer is signed.
 - Linux build deps: `build-essential pkg-config libgtk-4-dev libwebkitgtk-6.0-dev` (re-verify on every Wails bump).

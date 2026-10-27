@@ -6,7 +6,7 @@ Unicode true
 ## shortcut, optional "Start PRism when I sign in", clean uninstall.
 ##
 ## Built by `wails3 task windows:package` (makensis). For manual runs:
-## > makensis -DARG_WAILS_AMD64_BINARY=..\..\..\bin\prism.exe -DINFO_PRODUCTVERSION=0.1.0 project.nsi
+## > makensis -DARG_WAILS_AMD64_BINARY=..\..\..\bin\prism-amd64.exe -DARG_WAILS_ARM64_BINARY=..\..\..\bin\prism-arm64.exe -DINFO_PRODUCTVERSION=0.1.0 project.nsi
 ####
 !define INFO_PROJECTNAME "prism"
 !define INFO_COMPANYNAME "PRism"

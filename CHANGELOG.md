@@ -7,6 +7,12 @@ as the release notes.
 
 ## [Unreleased]
 
+## [1.2.0] - 2026-10-27
+
+### Added
+- Windows on ARM (ARM64) support: the Windows installer, now
+  `PRism-<version>-windows-setup.exe`, installs the native build for x64 or ARM64 PCs.
+
 ## [1.1.0] - 2026-10-26
 
 ### Added

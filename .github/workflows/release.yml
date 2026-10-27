@@ -68,9 +68,15 @@ jobs:
         run: |
           v="${PRISM_VERSION#v}"; v="${v%%-*}"
           sed -i "s/\"0\.0\.0\"/\"${v}\"/g" build/windows/info.json
-      - name: Build prism.exe
-        run: wails3 task windows:build
-      - name: Sign prism.exe
+      # One installer for x64 and ARM64: NSIS picks the native exe at install time
+      # (wails_tools.nsh). Pure Go (CGO off), so arm64 cross-compiles on this runner.
+      - name: Build prism.exe (amd64 + arm64)
+        run: |
+          wails3 task windows:build ARCH=amd64
+          mv bin/prism.exe bin/prism-amd64.exe
+          wails3 task windows:build ARCH=arm64
+          mv bin/prism.exe bin/prism-arm64.exe
+      - name: Sign prism-amd64.exe and prism-arm64.exe
         if: env.HAS_CERT == 'true'
         env:
           WINDOWS_CERT_PFX_BASE64: ${{ secrets.WINDOWS_CERT_PFX_BASE64 }}
@@ -79,15 +85,16 @@ jobs:
         run: |
           [IO.File]::WriteAllBytes("$env:RUNNER_TEMP\cert.pfx", [Convert]::FromBase64String($env:WINDOWS_CERT_PFX_BASE64))
           $signtool = Get-ChildItem "C:\Program Files (x86)\Windows Kits\10\bin\*\x64\signtool.exe" | Select-Object -Last 1
-          & $signtool.FullName sign /f "$env:RUNNER_TEMP\cert.pfx" /p $env:WINDOWS_CERT_PASSWORD /fd sha256 /tr http://timestamp.digicert.com /td sha256 bin\prism.exe
+          & $signtool.FullName sign /f "$env:RUNNER_TEMP\cert.pfx" /p $env:WINDOWS_CERT_PASSWORD /fd sha256 /tr http://timestamp.digicert.com /td sha256 bin\prism-amd64.exe bin\prism-arm64.exe
       - name: Build installer
         run: |
           v="${PRISM_VERSION#v}"; v="${v%%-*}"
           wails3 generate webview2bootstrapper -dir build/windows/nsis
           # makensis on Windows only splits paths on "\", so pass a native path.
-          exe="$(cygpath -w "$GITHUB_WORKSPACE/bin/prism.exe")"
+          amd64="$(cygpath -w "$GITHUB_WORKSPACE/bin/prism-amd64.exe")"
+          arm64="$(cygpath -w "$GITHUB_WORKSPACE/bin/prism-arm64.exe")"
           cd build/windows/nsis
-          makensis -DINFO_PRODUCTVERSION="${v}" -DARG_WAILS_AMD64_BINARY="${exe}" project.nsi
+          makensis -DINFO_PRODUCTVERSION="${v}" -DARG_WAILS_AMD64_BINARY="${amd64}" -DARG_WAILS_ARM64_BINARY="${arm64}" project.nsi
       - name: Sign installer
         if: env.HAS_CERT == 'true'
         env:
@@ -103,7 +110,7 @@ jobs:
         run: |
           v="${PRISM_VERSION#v}"
           mkdir -p dist
-          mv bin/PRism-*-setup.exe "dist/PRism-${v}-windows-amd64-setup.exe"
+          mv bin/PRism-*-setup.exe "dist/PRism-${v}-windows-setup.exe"
       - uses: actions/upload-artifact@v4
         with: { name: windows, path: dist/*, if-no-files-found: error }
 
